@@ -46,7 +46,7 @@ public class Dude : WadeBehaviour
 
 		transform.position = Planet.GetNearestSurfacePos(transform.position);
 		transform.position += Planet.GetNormalAtPosition(transform.position) * _groundOffset;
-    }
+	}
 
 	void FixedUpdate()
 	{
