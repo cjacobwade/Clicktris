@@ -6,7 +6,7 @@ public class Planet : Singleton<Planet>
 {
 	LookAtDirection[] _decorPrefabs = null;
 	List<LookAtDirection> _decor = new List<LookAtDirection>();
-	List<Vector3> _decorOffsets = new List<Vector3>();
+	List<Vector3> _decorBasePoses = new List<Vector3>();
 
 	Dude[] _dudePrefabs = null;
 	List<Dude> _dudes = new List<Dude>();
@@ -24,19 +24,10 @@ public class Planet : Singleton<Planet>
 	float _forwardOffset = 0.1f;
 
 	[SerializeField]
-	Vector2 _rotateSpeed = new Vector2(8f, 14f);
-
-	[SerializeField]
 	float _noiseScale = 5f;
 
 	[SerializeField, Range(0f, 0.99f)]
 	float _noiseSpawnThreshold = 0.3f;
-
-	[SerializeField]
-	float _decelSpeed = 5f;
-
-	Vector2 _inputVec = Vector2.zero;
-	Vector2 _prevMousePos = Vector2.zero;
 
 	void Awake()
 	{
@@ -55,7 +46,7 @@ public class Planet : Singleton<Planet>
 			spawnOffset *= _scaleMesh.localScale.x / 2f;
 			decor.transform.position = transform.position + spawnOffset;
 
-			_decorOffsets.Add(spawnOffset);
+			_decorBasePoses.Add(spawnOffset);
 			_decor.Add(decor);
 		}
 
@@ -75,31 +66,16 @@ public class Planet : Singleton<Planet>
 	{
 		for(int i = 0; i < _decor.Count; i++)
 		{
-			_decor[i].transform.position = transform.position + transform.rotation * _decorOffsets[i];
-
-			Vector3 toCamera = Camera.main.transform.position - _decor[i].transform.position;
-			_decor[i].transform.position += Vector3.zero.SetZ(toCamera.z).normalized * _forwardOffset;
+			Vector3 decorPos = transform.position + _decorBasePoses[i];
+			decorPos += -Camera.main.transform.forward * _forwardOffset;
 
 			Vector3 toDecor = (_decor[i].transform.position - transform.position).normalized;
-			float edgeDot = Mathf.Abs(Vector3.Dot(toDecor, Vector3.forward));
-			_decor[i].up = Vector3.Lerp(toDecor, Vector3.up, edgeDot);
+			float edgeDot = Mathf.Abs(Vector3.Dot(toDecor, Camera.main.transform.forward));
+			_decor[i].forward = -Camera.main.transform.forward;
+			_decor[i].up = Vector3.Lerp(toDecor, Camera.main.transform.up, edgeDot);
+
+			_decor[i].transform.position = decorPos;
 		}
-
-		if (Input.GetMouseButtonDown(0))
-			_prevMousePos = Input.mousePosition;
-
-		if (Input.GetMouseButton(0))
-			_inputVec = ((Vector2)Input.mousePosition - _prevMousePos);
-		else
-			_inputVec -= Vector2.ClampMagnitude(_inputVec * _decelSpeed * Time.deltaTime, _inputVec.magnitude);
-
-		Vector3 upVec = transform.InverseTransformDirection(Camera.main.transform.up);
-		transform.Rotate(upVec, -_inputVec.x * _rotateSpeed.x * Time.deltaTime);
-
-		Vector3 rightVec = transform.InverseTransformDirection(Camera.main.transform.right);
-		transform.Rotate(rightVec, _inputVec.y * _rotateSpeed.y * Time.deltaTime);
-
-		_prevMousePos = Input.mousePosition;	
 	}
 
 	public static Vector3 GetNormalAtPosition(Vector3 position)

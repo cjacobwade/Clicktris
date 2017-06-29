@@ -11,7 +11,7 @@ public class Dude : WadeBehaviour
 	[SerializeField]
 	float _projectorOffset = 0.3f;
 
-	Vector3 _relativeTargetPos = Vector3.zero;
+	Vector3 _targetPos = Vector3.zero;
 
 	[SerializeField]
 	float _maxReachTargetDist = 0.3f;
@@ -29,6 +29,23 @@ public class Dude : WadeBehaviour
 	float _clickWaitTime = 0.7f;
 
 	float _lastClickTime = -10000f;
+
+	[SerializeField]
+	int _clicksToDrop = 5;
+
+	int _numClicks = 0;
+
+	[SerializeField]
+	Block _blockPrefab = null;
+
+	[SerializeField]
+	float _blockDropTime = 1f;
+
+	[SerializeField]
+	float _blockRandomRange = 1f;
+
+	[SerializeField]
+	float _blockArcHeight = 1f;
 
 	Coroutine _goToTargetRoutine = null;
 
@@ -59,8 +76,7 @@ public class Dude : WadeBehaviour
 
 	void SetTargetPos(Vector3 targetPos)
 	{
-		_relativeTargetPos = Planet.GetNearestSurfacePos(targetPos);
-		_relativeTargetPos = Planet.instance.transform.InverseTransformPoint(_relativeTargetPos);
+		_targetPos = Planet.GetNearestSurfacePos(targetPos);
 
 		if (_goToTargetRoutine != null)
 			StopCoroutine(_goToTargetRoutine);
@@ -70,6 +86,14 @@ public class Dude : WadeBehaviour
 
 	void OnMouseDown()
 	{
+		if (++_numClicks > _clicksToDrop)
+		{
+			Block block = Instantiate<Block>(_blockPrefab, Planet.instance.transform);
+			StartCoroutine(DropBlockRoutine(block));
+
+			_numClicks = 0;
+		}
+
 		_lastClickTime = Time.time;
 		_clickTween.Play();
 
@@ -80,15 +104,33 @@ public class Dude : WadeBehaviour
 		}
 	}
 
+	IEnumerator DropBlockRoutine(Block block)
+	{
+		Vector3 startPos = transform.position;
+		Vector3 endPos = transform.position + Random.insideUnitSphere * _blockRandomRange;
+		endPos = Planet.GetNearestSurfacePos(endPos);
+
+		float timer = 0f;
+		while(timer < _blockDropTime)
+		{
+			timer += Time.fixedDeltaTime;
+
+			float alpha = timer / _blockDropTime;
+			block.transform.position = Vector3.Lerp(startPos, endPos, alpha);
+			block.transform.position += Planet.GetNormalAtPosition(block.transform.position) * Mathf.Sin(alpha * Mathf.PI) * _blockArcHeight;
+
+			yield return new WaitForFixedUpdate();
+		}
+	}
+
 	IEnumerator GoToTargetRoutine()
 	{
 		_prevPos = transform.position;
 
-		Vector3 worldTargetPos = Planet.instance.transform.TransformPoint(_relativeTargetPos);
-		while(Vector3.Distance(transform.position, worldTargetPos) > _maxReachTargetDist)
+		while(Vector3.Distance(transform.position, _targetPos) > _maxReachTargetDist)
 		{
 			Vector3 currentNormal = Planet.GetNormalAtPosition(transform.position);
-			Vector3 targetNormal = Planet.GetNormalAtPosition(worldTargetPos);
+			Vector3 targetNormal = Planet.GetNormalAtPosition(_targetPos);
 
 			Vector3 axis = transform.InverseTransformDirection(Vector3.Cross(currentNormal, targetNormal));
 			float angle = Vector3.Angle(currentNormal, targetNormal);
@@ -101,13 +143,11 @@ public class Dude : WadeBehaviour
 			Vector2 screenDelta = Camera.main.WorldToScreenPoint(transform.position) - Camera.main.WorldToScreenPoint(_prevPos);
 			screenDelta -= camScreenDelta;
 
-			spriteRenderer.flipX = screenDelta.x < 0f;
+			spriteRenderer.flipX = screenDelta.x > 0f;
 
 			_prevPos = transform.position;
 
 			yield return new WaitForFixedUpdate();
-
-			worldTargetPos = Planet.instance.transform.TransformPoint(_relativeTargetPos);
 		}
 
 		_goToTargetRoutine = null;
@@ -115,18 +155,16 @@ public class Dude : WadeBehaviour
 
 	void OnDrawGizmosSelected()
 	{
-		Vector3 worldTargetPos = Planet.instance.transform.TransformPoint(_relativeTargetPos);
-
 		Gizmos.color = Color.red;
-		Gizmos.DrawSphere(worldTargetPos, 0.2f);
+		Gizmos.DrawSphere(_targetPos, 0.2f);
 
 		int pathIterations = 50;
 		for (int i = 1; i < pathIterations; i++)
 		{
-			Vector3 prevPos = Vector3.Lerp(transform.position, worldTargetPos, (i - 1) / (float)pathIterations);
+			Vector3 prevPos = Vector3.Lerp(transform.position, _targetPos, (i - 1) / (float)pathIterations);
 			prevPos = Planet.GetNearestSurfacePos(prevPos);
 
-			Vector3 nextPos = Vector3.Lerp(transform.position, worldTargetPos, i / (float)pathIterations);
+			Vector3 nextPos = Vector3.Lerp(transform.position, _targetPos, i / (float)pathIterations);
 			nextPos = Planet.GetNearestSurfacePos(nextPos);
 
 			Gizmos.color = Color.white;
