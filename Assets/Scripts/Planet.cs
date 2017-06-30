@@ -6,6 +6,7 @@ public class Planet : Singleton<Planet>
 {
 	LookAtDirection[] _decorPrefabs = null;
 	List<LookAtDirection> _decor = new List<LookAtDirection>();
+	List<SpriteRenderer> _decorSprite = new List<SpriteRenderer>();
 	List<Vector3> _decorBasePoses = new List<Vector3>();
 
 	Dude[] _dudePrefabs = null;
@@ -47,6 +48,7 @@ public class Planet : Singleton<Planet>
 			decor.transform.position = transform.position + spawnOffset;
 
 			_decorBasePoses.Add(spawnOffset);
+			_decorSprite.Add(decor.GetComponentInChildren<SpriteRenderer>());
 			_decor.Add(decor);
 		}
 
@@ -62,7 +64,7 @@ public class Planet : Singleton<Planet>
 		}
 	}
 
-	void FixedUpdate()
+	void Update()
 	{
 		for(int i = 0; i < _decor.Count; i++)
 		{
@@ -70,9 +72,12 @@ public class Planet : Singleton<Planet>
 			decorPos += -Camera.main.transform.forward * _forwardOffset;
 
 			Vector3 toDecor = (_decor[i].transform.position - transform.position).normalized;
-			float edgeDot = Mathf.Abs(Vector3.Dot(toDecor, Camera.main.transform.forward));
+			float edgeDot = Vector3.Dot(toDecor, Camera.main.transform.forward);
+
+			_decorSprite[i].enabled = edgeDot < 0.6f;
+
 			_decor[i].forward = -Camera.main.transform.forward;
-			_decor[i].up = Vector3.Lerp(toDecor, Camera.main.transform.up, edgeDot);
+			_decor[i].up = Vector3.Lerp(toDecor, Camera.main.transform.up, Mathf.Abs(edgeDot));
 
 			_decor[i].transform.position = decorPos;
 		}

@@ -10,10 +10,20 @@ public class CameraOrbit : WadeBehaviour
 	[SerializeField]
 	float _decelSpeed = 5f;
 
+#if UNITY_ANDROID
+	[SerializeField]
+	float _androidSpeedMod = 0.6f;
+#endif
+
+#if UNITY_IOS
+	[SerializeField]
+	float _iosSpeedMod = 0.6f;
+#endif
+
 	Vector2 _inputVec = Vector2.zero;
 	Vector2 _prevMousePos = Vector2.zero;
 
-	void FixedUpdate()
+	void Update()
 	{
 		if (Input.GetMouseButtonDown(0))
 			_prevMousePos = Input.mousePosition;
@@ -23,8 +33,15 @@ public class CameraOrbit : WadeBehaviour
 		else
 			_inputVec -= Vector2.ClampMagnitude(_inputVec * _decelSpeed * Time.deltaTime, _inputVec.magnitude);
 
-		transform.RotateAround(Planet.instance.transform.position, transform.up, _inputVec.x * _rotateSpeed.x * Time.deltaTime);
-		transform.RotateAround(Planet.instance.transform.position, transform.right, -_inputVec.y * _rotateSpeed.y * Time.deltaTime);
+		Vector2 speed = _rotateSpeed * Time.deltaTime;
+#if UNITY_IOS && !UNITY_EDITOR
+		speed *= _iosSpeedMod;
+#elif UNITY_ANDROID && !UNITY_EDITOR
+		speed *= _androidSpeedMod;
+#endif
+
+		transform.RotateAround(Planet.instance.transform.position, transform.up, _inputVec.x * speed.x);
+		transform.RotateAround(Planet.instance.transform.position, transform.right, -_inputVec.y * speed.y);
 
 		_prevMousePos = Input.mousePosition;
 	}

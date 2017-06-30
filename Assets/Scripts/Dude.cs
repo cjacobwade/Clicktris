@@ -4,12 +4,7 @@ using UnityEngine;
 
 public class Dude : WadeBehaviour
 {
-	Projector _projector = null;
-
 	ScaleTween _clickTween = null;
-
-	[SerializeField]
-	float _projectorOffset = 0.3f;
 
 	Vector3 _targetPos = Vector3.zero;
 
@@ -47,13 +42,15 @@ public class Dude : WadeBehaviour
 	[SerializeField]
 	float _blockArcHeight = 1f;
 
+	[SerializeField]
+	float _blockGroundOffset = 0.15f;
+
 	Coroutine _goToTargetRoutine = null;
 
 	Vector3 _prevPos = Vector3.zero;
 
 	void Start()
 	{
-		_projector = GetComponentInChildren<Projector>();
 		_spriteRenderer = GetComponentInChildren<SpriteRenderer>();
 		_animator = GetComponentInChildren<Animator>();
 
@@ -65,11 +62,8 @@ public class Dude : WadeBehaviour
 		transform.position += Planet.GetNormalAtPosition(transform.position) * _groundOffset;
 	}
 
-	void FixedUpdate()
+	void Update()
 	{
-		_projector.transform.position = transform.position + Planet.GetNormalAtPosition(transform.position) * _projectorOffset;
-		_projector.transform.LookAt(transform.position);
-
 		if (_goToTargetRoutine == null && Time.time - _lastClickTime > _clickWaitTime)
 			SetTargetPos(transform.position + Random.insideUnitSphere * _wanderDist);
 	}
@@ -107,19 +101,25 @@ public class Dude : WadeBehaviour
 	IEnumerator DropBlockRoutine(Block block)
 	{
 		Vector3 startPos = transform.position;
-		Vector3 endPos = transform.position + Random.insideUnitSphere * _blockRandomRange;
+
+		Vector3 randomOffset = Random.insideUnitSphere;
+		Vector3 normal = Planet.GetNormalAtPosition(transform.position);
+		randomOffset -= normal * Mathf.Abs(Vector3.Dot(randomOffset.normalized, normal));
+
+		Vector3 endPos = transform.position + randomOffset.normalized * _blockRandomRange;
 		endPos = Planet.GetNearestSurfacePos(endPos);
+		endPos += Planet.GetNormalAtPosition(endPos) * _blockGroundOffset;
 
 		float timer = 0f;
 		while(timer < _blockDropTime)
 		{
-			timer += Time.fixedDeltaTime;
+			timer += Time.deltaTime;
 
 			float alpha = timer / _blockDropTime;
 			block.transform.position = Vector3.Lerp(startPos, endPos, alpha);
 			block.transform.position += Planet.GetNormalAtPosition(block.transform.position) * Mathf.Sin(alpha * Mathf.PI) * _blockArcHeight;
 
-			yield return new WaitForFixedUpdate();
+			yield return null;
 		}
 	}
 
@@ -147,7 +147,7 @@ public class Dude : WadeBehaviour
 
 			_prevPos = transform.position;
 
-			yield return new WaitForFixedUpdate();
+			yield return null;
 		}
 
 		_goToTargetRoutine = null;

@@ -7,6 +7,11 @@ public class LookAtCamera : WadeBehaviour
 	void LateUpdate()
 	{
 		if (Camera.main)
-			transform.LookAt(Camera.main.transform, Camera.main.transform.up);
+		{
+			if (Camera.main.orthographic)
+				transform.LookAt(transform.position + -Camera.main.transform.forward, Camera.main.transform.up);
+			else
+				transform.LookAt(Camera.main.transform, Camera.main.transform.up);
+		}
 	}
 }
