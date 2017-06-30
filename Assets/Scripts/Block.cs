@@ -47,6 +47,23 @@ public class Block : WadeBehaviour
 			_blockAnims[i].Play(string.Format("BlockJiggle{0}", Random.Range(1, 4)), 0, Random.value);
 	}
 
+	void Update()
+	{
+		if (_activeInputLens == null)
+		{
+			Vector3 toBlock = (transform.position - Planet.instance.transform.position).normalized;
+			float edgeDot = Vector3.Dot(toBlock, Camera.main.transform.forward);
+
+			for(int i = 0; i < _bitSprites.Length; i++)
+				_spriteRenderer.enabled = edgeDot < 0.7f;
+		}
+		else
+		{
+			for (int i = 0; i < _bitSprites.Length; i++)
+				_spriteRenderer.enabled = true;
+		}
+	}
+
 	void OnMouseDown()
 	{
 		if(CameraOrbit.inputFreeLens && _dropRoutine == null)

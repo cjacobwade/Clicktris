@@ -66,6 +66,10 @@ public class Dude : WadeBehaviour
 	{
 		if (_goToTargetRoutine == null && Time.time - _lastClickTime > _clickWaitTime)
 			SetTargetPos(transform.position + Random.insideUnitSphere * _wanderDist);
+
+		Vector3 toDude = (transform.position - Planet.instance.transform.position).normalized;
+		float edgeDot = Vector3.Dot(toDude, Camera.main.transform.forward);
+		_spriteRenderer.enabled = edgeDot < 0.6f;
 	}
 
 	void SetTargetPos(Vector3 targetPos)
@@ -100,6 +104,8 @@ public class Dude : WadeBehaviour
 
 	IEnumerator DropBlockRoutine(Block block)
 	{
+		block.collider.enabled = false;
+
 		Vector3 startPos = transform.position;
 
 		Vector3 randomOffset = Random.insideUnitSphere;
@@ -121,6 +127,8 @@ public class Dude : WadeBehaviour
 
 			yield return null;
 		}
+
+		block.collider.enabled = true;
 	}
 
 	IEnumerator GoToTargetRoutine()
