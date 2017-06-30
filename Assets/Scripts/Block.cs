@@ -33,10 +33,18 @@ public class Block : WadeBehaviour
 
 	[SerializeField]
 	float _changeScaleTime = 0.5f;
+
+	[SerializeField]
+	float _gridSlotMaxDist = 0.1f;
+
+	[SerializeField]
+	float _gridSlotOffset = 0.3f;
 	
 	Coroutine _changeScaleRoutine = null;
 
 	bool _prevUIOverlap = false;
+
+	Dictionary<SpriteRenderer, BitSlotWidget> _spriteToSlotMap = new Dictionary<SpriteRenderer, BitSlotWidget>();
 
 	void Awake()
 	{
@@ -62,6 +70,9 @@ public class Block : WadeBehaviour
 			for (int i = 0; i < _bitSprites.Length; i++)
 				_bitSprites[i].enabled = true;
 		}
+
+		for (int i = 0; i < _bitSprites.Length; i++)
+			_bitSprites[i].transform.rotation = Quaternion.LookRotation(-Camera.main.transform.forward, Camera.main.transform.up);
 	}
 
 	void OnMouseDown()
@@ -100,6 +111,37 @@ public class Block : WadeBehaviour
 				_changeScaleRoutine = StartCoroutine(ChangeScaleRoutine(uiOverlap));
 				_prevUIOverlap = uiOverlap;
 			}
+
+			_spriteToSlotMap.Clear();
+			BitSlotWidget[] bitSlots = UIManager.GetPanel<InventoryPanel>().GetBitSlots();
+			for (int i = 0; i < bitSlots.Length; i++)
+				bitSlots[i].SetHighlight(false);
+
+			for(int i = 0; i < _bitSprites.Length; i++)
+			{
+				SpriteRenderer bitSprite = _bitSprites[i];
+				Vector3 spriteViewPos = Camera.main.WorldToViewportPoint(bitSprite.transform.position);
+				for (int j = 0; j < bitSlots.Length; j++)
+				{
+					BitSlotWidget bitSlot = bitSlots[j];
+					if (!bitSlot.used)
+					{
+						Vector3 slotViewPos = Camera.main.WorldToViewportPoint(bitSlot.transform.position);
+						if (Vector2.Distance(spriteViewPos, slotViewPos) < _gridSlotMaxDist)
+						{
+							// Temp-mark used so slots are distinct
+							bitSlot.used = true;
+							bitSlot.SetHighlight(true);
+							_spriteToSlotMap.Add(bitSprite, bitSlot);
+							break;
+						}
+					}
+				}
+			}
+
+			// Unmark temp-used slots
+			foreach(var kvp in _spriteToSlotMap)
+				kvp.Value.used = false;
 		}
 	}
 
@@ -111,16 +153,38 @@ public class Block : WadeBehaviour
 			CameraOrbit.inputFreeLens.RemoveRequestsWithContext(this);
 			_activeInputLens = null;
 
-			// TODO:
-			// Try and fit to grid
+			BitSlotWidget[] bitSlots = UIManager.GetPanel<InventoryPanel>().GetBitSlots();
+			for (int i = 0; i < bitSlots.Length; i++)
+				bitSlots[i].SetHighlight(false);
 
-			// Else
+			bool allMatched = _spriteToSlotMap.Count == _bitSprites.Length;
+			if (allMatched)
+			{
+				foreach(var kvp in _spriteToSlotMap)
+				{
+					BitSlotWidget slot = kvp.Value;
+					slot.used = true;
 
-			if (_changeScaleRoutine != null)
-				StopCoroutine(_changeScaleRoutine);
+					SpriteRenderer sprite = kvp.Key;
+					GameObject spriteParent = new GameObject("SpriteHolder");
+					sprite.transform.SetParent(spriteParent.transform);
+					sprite.transform.localPosition = Vector3.zero;
 
-			_changeScaleRoutine = StartCoroutine(ChangeScaleRoutine(false));
-			_dropRoutine = StartCoroutine(DropRoutine());
+					spriteParent.transform.SetParent(Camera.main.transform);
+					spriteParent.transform.localScale = transform.localScale;
+					spriteParent.transform.position = slot.transform.position + -Camera.main.transform.forward * _gridSlotOffset;
+				}
+
+				Destroy(gameObject);
+			}
+			else
+			{
+				if (_changeScaleRoutine != null)
+					StopCoroutine(_changeScaleRoutine);
+
+				_changeScaleRoutine = StartCoroutine(ChangeScaleRoutine(false));
+				_dropRoutine = StartCoroutine(DropRoutine());
+			}
 		}
 	}
 

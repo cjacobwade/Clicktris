@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using LinqTools;
 
 public class InventoryPanel : PanelBase
 {
@@ -9,4 +10,13 @@ public class InventoryPanel : PanelBase
 	RectTransform _inventoryRect = null;
 	public RectTransform GetInventoryRect()
 	{ return _inventoryRect; }
+
+	BitSlotWidget[] _bitSlots = null;
+	public BitSlotWidget[] GetBitSlots()
+	{ return _bitSlots; }
+
+	void Awake()
+	{
+		_bitSlots = _inventoryRect.GetComponentsInChildren<BitSlotWidget>();
+	}
 }
