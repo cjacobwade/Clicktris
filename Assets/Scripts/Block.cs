@@ -55,12 +55,12 @@ public class Block : WadeBehaviour
 			float edgeDot = Vector3.Dot(toBlock, Camera.main.transform.forward);
 
 			for(int i = 0; i < _bitSprites.Length; i++)
-				_spriteRenderer.enabled = edgeDot < 0.7f;
+				_bitSprites[i].enabled = edgeDot < 0.7f;
 		}
 		else
 		{
 			for (int i = 0; i < _bitSprites.Length; i++)
-				_spriteRenderer.enabled = true;
+				_bitSprites[i].enabled = true;
 		}
 	}
 
