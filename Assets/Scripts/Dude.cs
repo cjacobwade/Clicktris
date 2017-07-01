@@ -45,9 +45,28 @@ public class Dude : WadeBehaviour
 	[SerializeField]
 	float _blockGroundOffset = 0.15f;
 
+	[SerializeField]
+	float _maxEnlargeSize = 2f;
+
+	[SerializeField]
+	int _maxEnlargeNum = 2;
+
+	[HideInInspector]
+	public int numEnlarges = 0;
+
+	[SerializeField]
+	float _enlargeTime = 0.2f;
+
+	[SerializeField]
+	AnimationCurve _enlargeCurve = new AnimationCurve();
+
+	Coroutine _enlargeRoutine = null;
+
 	ParticleSystem _heartVFX = null;
 
 	Coroutine _goToTargetRoutine = null;
+
+	GroundShadow _shadow = null;
 
 	Vector3 _prevPos = Vector3.zero;
 
@@ -56,6 +75,7 @@ public class Dude : WadeBehaviour
 		_heartVFX = GetComponentInChildren<ParticleSystem>();
 		_spriteRenderer = GetComponentInChildren<SpriteRenderer>();
 		_animator = GetComponentInChildren<Animator>();
+		_shadow = GetComponent<GroundShadow>();
 
 		_clickTween = GetComponent<ScaleTween>();
 
@@ -73,6 +93,7 @@ public class Dude : WadeBehaviour
 		Vector3 toDude = (transform.position - Planet.instance.transform.position).normalized;
 		float edgeDot = Vector3.Dot(toDude, Camera.main.transform.forward);
 		_spriteRenderer.enabled = edgeDot < 0.6f;
+		_shadow.GetShadow().enabled = edgeDot < 0.6f;
 	}
 
 	void SetTargetPos(Vector3 targetPos)
@@ -85,16 +106,33 @@ public class Dude : WadeBehaviour
 		_goToTargetRoutine = StartCoroutine(GoToTargetRoutine());
 	}
 
+	public bool CanEnlarge()
+	{ return numEnlarges < _maxEnlargeNum; }
+
+	public void Enlarge()
+	{
+		numEnlarges++;
+
+		if (_enlargeRoutine != null)
+			StopCoroutine(_enlargeRoutine);
+
+		_enlargeRoutine = StartCoroutine(EnlargeRoutine());
+	}
+
 	void OnMouseDown()
 	{
-		_heartVFX.Emit(1);
+		_heartVFX.Emit(CameraOrbit.GetClickStrength());
 
-		if (++_numClicks > _clicksToDrop)
+		_numClicks += CameraOrbit.GetClickStrength();
+		if (_numClicks > _clicksToDrop)
 		{
-			_heartVFX.Emit(9);
+			_heartVFX.Emit(10);
 
-			Block block = Instantiate<Block>(_blockPrefab, Planet.instance.transform);
-			StartCoroutine(DropBlockRoutine(block));
+			for (int i = 0; i <= numEnlarges; i++)
+			{
+				Block block = Instantiate<Block>(_blockPrefab, Planet.instance.transform);
+				StartCoroutine(DropBlockRoutine(block));
+			}
 
 			_numClicks = 0;
 		}
@@ -107,6 +145,39 @@ public class Dude : WadeBehaviour
 			StopCoroutine(_goToTargetRoutine);
 			_goToTargetRoutine = null;
 		}
+	}
+
+	IEnumerator EnlargeRoutine()
+	{
+		_lastClickTime = Time.time;
+		if (_goToTargetRoutine != null)
+		{
+			StopCoroutine(_goToTargetRoutine);
+			_goToTargetRoutine = null;
+		}
+
+		_clickTween.enabled = false;
+		animator.enabled = false;
+
+		Vector3 startScale = transform.localScale;
+		Vector3 endScale = Vector3.Lerp(Vector3.one, Vector3.one * _maxEnlargeSize, numEnlarges / (float)_maxEnlargeNum);
+
+		float timer = 0f;
+		while(timer < _enlargeTime)
+		{
+			timer += Time.deltaTime;
+
+			float alpha = _enlargeCurve.Evaluate(timer / _enlargeTime);
+			transform.localScale = Vector3.LerpUnclamped(startScale, endScale, alpha);
+			_clickTween.initScale = transform.localScale;
+
+			yield return null;
+		}
+
+		_clickTween.enabled = true;
+		animator.enabled = true;
+
+		_enlargeRoutine = null;
 	}
 
 	IEnumerator DropBlockRoutine(Block block)
@@ -144,7 +215,8 @@ public class Dude : WadeBehaviour
 	{
 		_prevPos = transform.position;
 
-		while(Vector3.Distance(transform.position, _targetPos) > _maxReachTargetDist)
+		float targetDist = Vector3.Distance(Planet.GetNearestSurfacePos(transform.position), _targetPos);
+		while(targetDist > _maxReachTargetDist)
 		{
 			Vector3 currentNormal = Planet.GetNormalAtPosition(transform.position);
 			Vector3 targetNormal = Planet.GetNormalAtPosition(_targetPos);
@@ -165,6 +237,8 @@ public class Dude : WadeBehaviour
 			_prevPos = transform.position;
 
 			yield return null;
+
+			targetDist = Vector3.Distance(Planet.GetNearestSurfacePos(transform.position), _targetPos);
 		}
 
 		_goToTargetRoutine = null;

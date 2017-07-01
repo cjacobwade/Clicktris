@@ -8,7 +8,8 @@ public enum BlockType
 	Red,
 	Gat,
 	Bop,
-	Bull
+	Bull,
+	Random
 }
 
 public class Block : WadeBehaviour
@@ -27,8 +28,18 @@ public class Block : WadeBehaviour
 	public BlockType GetBlockType()
 	{ return _blockType; }
 
+	[SerializeField]
+	Sprite _defaultSprite = null;
+
+	[SerializeField]
+	Sprite _goldSprite = null;
+
+	bool _gold = false;
+
 	Animator[] _blockAnims = null;
 	SpriteRenderer[] _bitSprites = null;
+	public SpriteRenderer[] GetBitSprites()
+	{ return _bitSprites; }
 
 	LensHandle<bool> _activeInputLens = null;
 
@@ -64,6 +75,8 @@ public class Block : WadeBehaviour
 
 	[SerializeField]
 	Transform _rotatePivot = null;
+	public Transform GetRotatePivot()
+	{ return _rotatePivot; }
 
 	[SerializeField]
 	float _rotateTime = 0.2f;
@@ -142,7 +155,7 @@ public class Block : WadeBehaviour
 		for (int i = 0; i < _bitSprites.Length; i++)
 			_bitSprites[i].transform.rotation = Quaternion.LookRotation(-Camera.main.transform.forward, Camera.main.transform.up);
 
-		if(Time.time - _lastTouchTime > _timeBeforeFadeout && _fadeoutRoutine == null)
+		if(Time.time - _lastTouchTime > _timeBeforeFadeout && _fadeoutRoutine == null && !_gold)
 			_fadeoutRoutine = StartCoroutine(FadeoutRoutine());
 	}
 
@@ -317,6 +330,16 @@ public class Block : WadeBehaviour
 				_dropRoutine = StartCoroutine(DropRoutine());
 			}
 		}
+	}
+
+	public void SetGold(bool gold)
+	{
+		for (int i = 0; i < _bitSprites.Length; i++)
+			_bitSprites[i].sprite = gold ? _goldSprite : _defaultSprite;
+
+		ResetFadeoutTimer();
+
+		_gold = gold;
 	}
 
 	void ResetFadeoutTimer()

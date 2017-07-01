@@ -16,7 +16,12 @@ public class GroundShadow : WadeBehaviour
 
 	void Awake()
 	{
-		_shadow = Instantiate<SpriteRenderer>(_shadowPrefab, transform);
+		Transform shadowTransform = transform.FindChild("Shadow(Clone)");
+		if(shadowTransform)
+			_shadow = shadowTransform.GetComponent<SpriteRenderer>();
+
+		if(!_shadow)
+			_shadow = Instantiate<SpriteRenderer>(_shadowPrefab, transform);
 	}
 
 	void Update()

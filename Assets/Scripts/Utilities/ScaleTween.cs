@@ -24,7 +24,7 @@ public class ScaleTween : WadeBehaviour
 	{ return _playRoutine != null; }
 
 	[SerializeField]
-	Vector3 _initScale = Vector3.one;
+	public Vector3 initScale = Vector3.one;
 
 	void OnEnable()
 	{
@@ -34,12 +34,12 @@ public class ScaleTween : WadeBehaviour
 
 	public void SetToDefault()
 	{
-		transform.localScale = _initScale;
+		transform.localScale = initScale;
 	}
 
 	public void SetAlpha(float alpha)
 	{
-		transform.localScale = _initScale * _scaleRange.UnclampedLerp(alpha);
+		transform.localScale = initScale * _scaleRange.UnclampedLerp(alpha);
 	}
 
 	public Coroutine Play(bool forward = true)
@@ -68,7 +68,7 @@ public class ScaleTween : WadeBehaviour
 				if (!forward)
 					alpha = 1f - alpha;
 
-				transform.localScale = _initScale * Mathf.Clamp(_scaleRange.UnclampedLerp(alpha), 0f, Mathf.Infinity);
+				transform.localScale = initScale * Mathf.Clamp(_scaleRange.UnclampedLerp(alpha), 0f, Mathf.Infinity);
 
 				tweenTimer += Time.deltaTime;
 				yield return null;

@@ -7,6 +7,7 @@ public class CloneItem : CastItem
 	protected override void ApplyEffect(RaycastHit hitInfo)
 	{
 		Dude dude = hitInfo.transform.GetComponent<Dude>();
-		Instantiate(dude, Planet.instance.transform);
+		Dude newDude = Instantiate(dude, Planet.instance.transform);
+		newDude.numEnlarges = dude.numEnlarges;
 	}
 }

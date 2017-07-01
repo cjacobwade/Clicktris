@@ -9,6 +9,6 @@ public class PlantItem : CastItem
 
 	protected override void ApplyEffect(RaycastHit hitInfo)
 	{
-		Planet.instance.SpawnDecor(_decor, hitInfo.point - hitInfo.normal * 0.15f);
+		Planet.SpawnDecor(_decor, hitInfo.point - hitInfo.normal * 0.15f);
 	}
 }

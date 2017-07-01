@@ -31,6 +31,13 @@ public class CameraOrbit : Singleton<CameraOrbit>
 	public static LensManager<bool> inputFreeLens
 	{ get { return instance._inputFreeLens; } }
 
+	int _clickStrength = 1;
+	public static int GetClickStrength()
+	{ return instance._clickStrength; }
+
+	public static void AddClickStrength()
+	{ instance._clickStrength++; }
+
 	void Awake()
 	{
 		UIManager.GetPanel<InventoryPanel>().gameObject.SetActive(true);

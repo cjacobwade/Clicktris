@@ -26,9 +26,6 @@ public class Planet : Singleton<Planet>
 	[SerializeField]
 	float _noiseScale = 5f;
 
-	[SerializeField, Range(0f, 0.99f)]
-	float _noiseSpawnThreshold = 0.3f;
-
 	void Awake()
 	{
 		_decorPrefabs = Resources.LoadAll<Decor>("Decor").ToList();
@@ -42,41 +39,50 @@ public class Planet : Singleton<Planet>
 		_dudePrefabs = Resources.LoadAll<Dude>("Dudes");
 
 		for(int i = 0; i < _numDudes; i++)
-		{
-			Dude dude = Instantiate<Dude>(_dudePrefabs[i], transform);
-			dude.transform.position = GetNearestSurfacePos(transform.position + Random.insideUnitSphere);
-
-			_dudes.Add(dude);
-		}
+			SpawnDude(_dudePrefabs[i]);
 	}
 
-	public void SpawnDecor(Decor decorPrefab, Vector3? spawnPos = null)
+	public static void SpawnDecor(Decor decorPrefab, Vector3? spawnPos = null)
 	{
-		Decor decor = Instantiate<Decor>(decorPrefab, transform);
+		Decor decor = Instantiate<Decor>(decorPrefab, instance.transform);
 		decor.spriteRenderer.flipX = Random.value > 0.5f;
 
 		if (!spawnPos.HasValue)
 		{
 			Vector3 spawnOffset = Random.insideUnitSphere.normalized * 0.99f;
 			float noise = Mathf.PerlinNoise(
-				(spawnOffset.x + spawnOffset.z) * _noiseScale,
-				(spawnOffset.y + spawnOffset.z) * _noiseScale);
+				(spawnOffset.x + spawnOffset.z) * instance._noiseScale,
+				(spawnOffset.y + spawnOffset.z) * instance._noiseScale);
 
 			while (noise < decorPrefab.GetNoiseThreshold())
 			{
 				spawnOffset = Random.insideUnitSphere.normalized * 0.99f;
 				noise = Mathf.PerlinNoise(
-					(spawnOffset.x + spawnOffset.z) * _noiseScale,
-					(spawnOffset.y + spawnOffset.z) * _noiseScale);
+					(spawnOffset.x + spawnOffset.z) * instance._noiseScale,
+					(spawnOffset.y + spawnOffset.z) * instance._noiseScale);
 			}
 
-			spawnOffset *= _scaleMesh.localScale.x / 2f;
-			spawnPos = transform.position + spawnOffset;
+			spawnOffset *= instance._scaleMesh.localScale.x / 2f;
+			spawnPos = instance.transform.position + spawnOffset;
 		}
 
 		decor.transform.position = spawnPos.Value;
-		decor.initOffset = spawnPos.Value - transform.position;
-		_decor.Add(decor);
+		decor.initOffset = spawnPos.Value - instance.transform.position;
+		instance._decor.Add(decor);
+	}
+	
+	public static Dude SpawnDude(Dude dudePrefab, Vector3? spawnPos = null)
+	{
+		Dude dude = Instantiate<Dude>(dudePrefab, instance.transform);
+
+		if(!spawnPos.HasValue)
+			spawnPos = GetNearestSurfacePos(instance.transform.position + Random.insideUnitSphere);
+
+		dude.transform.position = spawnPos.Value;
+
+		instance._dudes.Add(dude);
+
+		return dude;
 	}
 
 	void Update()

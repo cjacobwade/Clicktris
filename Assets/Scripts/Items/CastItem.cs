@@ -29,7 +29,7 @@ public abstract class CastItem : WadeBehaviour, IPointerDownHandler, IPointerUpH
 	void Fire()
 	{
 		Vector3 rayPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-		if (Physics.Raycast(rayPos, Camera.main.transform.forward, out _hitInfo, Mathf.Infinity, _rayLayer, QueryTriggerInteraction.Ignore))
+		if (Physics.Raycast(rayPos, Camera.main.transform.forward, out _hitInfo, Mathf.Infinity, _rayLayer, QueryTriggerInteraction.Ignore) && CanApply(_hitInfo))
 		{
 			ApplyEffect(_hitInfo);
 			Destroy(gameObject);
@@ -38,6 +38,9 @@ public abstract class CastItem : WadeBehaviour, IPointerDownHandler, IPointerUpH
 		CameraOrbit.inputFreeLens.RemoveRequestsWithContext(this);
 		CameraOrbit.unlockedLens.RemoveRequestsWithContext(this);
 	}
+
+	protected virtual bool CanApply(RaycastHit hitInfo)
+	{ return true; }
 
 	protected abstract void ApplyEffect(RaycastHit hitInfo);
 

@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: a850aefad7335854ab0fdd6fbea4a112
-timeCreated: 1498883712
+timeCreated: 1498902576
 licenseType: Pro
 TextureImporter:
   fileIDToRecycleName:
@@ -30,6 +30,14 @@ TextureImporter:
     21300046: TreeIcon
     21300048: EmbiggenIcon
     21300050: LockBlockIcon
+    21300052: Dome
+    21300054: DudeSheet_0
+    21300056: RedGold
+    21300058: BopGold
+    21300060: BunGold
+    21300062: BullGold
+    21300064: GatGold
+    21300066: GoldIcon
   serializedVersion: 4
   mipmaps:
     mipMapMode: 0
@@ -354,10 +362,10 @@ TextureImporter:
       name: EmbiggenIcon
       rect:
         serializedVersion: 2
-        x: 879
-        y: 655
-        width: 105
-        height: 105
+        x: 871
+        y: 680
+        width: 120
+        height: 120
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -369,6 +377,97 @@ TextureImporter:
         serializedVersion: 2
         x: 668
         y: 655
+        width: 120
+        height: 120
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Dome
+      rect:
+        serializedVersion: 2
+        x: 638
+        y: 847
+        width: 152
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: RedGold
+      rect:
+        serializedVersion: 2
+        x: 40
+        y: 7
+        width: 122
+        height: 116
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: BopGold
+      rect:
+        serializedVersion: 2
+        x: 187
+        y: 12
+        width: 120
+        height: 112
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: BunGold
+      rect:
+        serializedVersion: 2
+        x: 332
+        y: 13
+        width: 118
+        height: 119
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: BullGold
+      rect:
+        serializedVersion: 2
+        x: 476
+        y: 28
+        width: 119
+        height: 108
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: GatGold
+      rect:
+        serializedVersion: 2
+        x: 609
+        y: 20
+        width: 128
+        height: 111
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: GoldIcon
+      rect:
+        serializedVersion: 2
+        x: 828
+        y: 812
         width: 120
         height: 120
       alignment: 0
