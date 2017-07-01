@@ -86,6 +86,22 @@ public class Block : WadeBehaviour
 	LayerMask _planetLayer = 0;
 	RaycastHit _hitInfo = new RaycastHit();
 
+	[SerializeField]
+	float _timeBeforeFadeout = 5f;
+
+	[SerializeField]
+	float _fadeoutTime = 3f;
+
+	[SerializeField]
+	AnimationCurve _fadeoutCurve = new AnimationCurve();
+
+	[SerializeField]
+	int _numFadeoutFlashes = 4;
+
+	Coroutine _fadeoutRoutine = null;
+
+	float _lastTouchTime = 0f;
+
 	Collider[] _childColliders = null;
 	public Collider[] GetChildColliders()
 	{ return _childColliders; }
@@ -106,6 +122,8 @@ public class Block : WadeBehaviour
 		_blockAnims = GetComponentsInChildren<Animator>();
 		for (int i = 0; i < _blockAnims.Length; i++)
 			_blockAnims[i].Play(string.Format("BlockJiggle{0}", Random.Range(1, 4)), 0, Random.value);
+
+		ResetFadeoutTimer();
 	}
 
 	void Update()
@@ -126,6 +144,9 @@ public class Block : WadeBehaviour
 
 		for (int i = 0; i < _bitSprites.Length; i++)
 			_bitSprites[i].transform.rotation = Quaternion.LookRotation(-Camera.main.transform.forward, Camera.main.transform.up);
+
+		if(Time.time - _lastTouchTime > _timeBeforeFadeout && _fadeoutRoutine == null)
+			_fadeoutRoutine = StartCoroutine(FadeoutRoutine());
 	}
 
 	void OnMouseDown()
@@ -151,6 +172,8 @@ public class Block : WadeBehaviour
 
 			InventoryPanel inventoryPanel = UIManager.GetPanel<InventoryPanel>();
 			_prevUIOverlap = RectTransformUtility.RectangleContainsScreenPoint(inventoryPanel.GetInventoryRect(), mousePos, Camera.main);
+
+			ResetFadeoutTimer();
 		}
 	}
 
@@ -248,6 +271,8 @@ public class Block : WadeBehaviour
 			// Unmark temp-used slots
 			foreach (var kvp in _spriteToSlotMap)
 				kvp.Value.used = false;
+
+			ResetFadeoutTimer();
 		}
 	}
 
@@ -262,6 +287,8 @@ public class Block : WadeBehaviour
 			List<BitSlotWidget> bitSlots = GetInventory().GetBitSlots();
 			for (int i = 0; i < bitSlots.Count; i++)
 				bitSlots[i].SetHighlight(false);
+
+			ResetFadeoutTimer();
 
 			bool allMatched = _spriteToSlotMap.Count == _bitSprites.Length;
 			if (allMatched)
@@ -293,6 +320,40 @@ public class Block : WadeBehaviour
 				_dropRoutine = StartCoroutine(DropRoutine());
 			}
 		}
+	}
+
+	void ResetFadeoutTimer()
+	{
+		_lastTouchTime = Time.time;
+
+		if (_fadeoutRoutine != null)
+		{
+			StopCoroutine(_fadeoutRoutine);
+
+			for (int i = 0; i < _bitSprites.Length; i++)
+				_bitSprites[i].color = _bitSprites[i].color.SetA(1f);
+
+			_fadeoutRoutine = null;
+		}
+	}
+
+	IEnumerator FadeoutRoutine()
+	{
+		float timer = 0f;
+		while(timer < _fadeoutTime)
+		{
+			timer += Time.deltaTime;
+
+			float alpha = _fadeoutCurve.Evaluate(timer / _fadeoutTime);
+			alpha = Mathf.Abs(Mathf.Cos(alpha * Mathf.PI * _numFadeoutFlashes));
+			for (int i = 0; i < _bitSprites.Length; i++)
+				_bitSprites[i].color = _bitSprites[i].color.SetA(alpha);
+
+			yield return null;
+		}
+
+		_fadeoutRoutine = null;
+		Destroy(gameObject);
 	}
 
 	IEnumerator RotateRoutine(bool right)
