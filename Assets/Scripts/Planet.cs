@@ -1,13 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using LinqTools;
 
 public class Planet : Singleton<Planet>
 {
-	LookAtDirection[] _decorPrefabs = null;
-	List<LookAtDirection> _decor = new List<LookAtDirection>();
-	List<SpriteRenderer> _decorSprite = new List<SpriteRenderer>();
-	List<Vector3> _decorBasePoses = new List<Vector3>();
+	List<Decor> _decorPrefabs = new List<Decor>();
+	List<Decor> _decor = new List<Decor>();
 
 	Dude[] _dudePrefabs = null;
 	List<Dude> _dudes = new List<Dude>();
@@ -32,24 +31,12 @@ public class Planet : Singleton<Planet>
 
 	void Awake()
 	{
-		_decorPrefabs = Resources.LoadAll<LookAtDirection>("Decor");
+		_decorPrefabs = Resources.LoadAll<Decor>("Decor").ToList();
 
 		for(int i = 0; i < _numDecor; i++)
 		{
-			int decorIndex = Random.Range(0, _decorPrefabs.Length);
-			LookAtDirection decor = Instantiate<LookAtDirection>(_decorPrefabs[decorIndex], transform);
-			decor.GetComponentInChildren<SpriteRenderer>().flipX = Random.value > 0.5f;
-
-			Vector3 spawnOffset = Random.insideUnitSphere.normalized * 0.99f;
-			while(Mathf.PerlinNoise((spawnOffset.x + spawnOffset.z) * _noiseScale, (spawnOffset.y + spawnOffset.z) * _noiseScale) < _noiseSpawnThreshold)
-				spawnOffset = Random.insideUnitSphere.normalized * 0.99f;
-
-			spawnOffset *= _scaleMesh.localScale.x / 2f;
-			decor.transform.position = transform.position + spawnOffset;
-
-			_decorBasePoses.Add(spawnOffset);
-			_decorSprite.Add(decor.GetComponentInChildren<SpriteRenderer>());
-			_decor.Add(decor);
+			_decorPrefabs.Sort((x, y) => (y.GetWeight() * Random.value).CompareTo(x.GetWeight() * Random.value));
+			SpawnDecor(_decorPrefabs[0]);
 		}
 
 		_dudePrefabs = Resources.LoadAll<Dude>("Dudes");
@@ -63,20 +50,49 @@ public class Planet : Singleton<Planet>
 		}
 	}
 
+	public void SpawnDecor(Decor decorPrefab, Vector3? spawnPos = null)
+	{
+		Decor decor = Instantiate<Decor>(decorPrefab, transform);
+		decor.spriteRenderer.flipX = Random.value > 0.5f;
+
+		if (!spawnPos.HasValue)
+		{
+			Vector3 spawnOffset = Random.insideUnitSphere.normalized * 0.99f;
+			float noise = Mathf.PerlinNoise(
+				(spawnOffset.x + spawnOffset.z) * _noiseScale,
+				(spawnOffset.y + spawnOffset.z) * _noiseScale);
+
+			while (noise < decorPrefab.GetNoiseThreshold())
+			{
+				spawnOffset = Random.insideUnitSphere.normalized * 0.99f;
+				noise = Mathf.PerlinNoise(
+					(spawnOffset.x + spawnOffset.z) * _noiseScale,
+					(spawnOffset.y + spawnOffset.z) * _noiseScale);
+			}
+
+			spawnOffset *= _scaleMesh.localScale.x / 2f;
+			spawnPos = transform.position + spawnOffset;
+		}
+
+		decor.transform.position = spawnPos.Value;
+		decor.initOffset = spawnPos.Value - transform.position;
+		_decor.Add(decor);
+	}
+
 	void Update()
 	{
 		for(int i = 0; i < _decor.Count; i++)
 		{
-			Vector3 decorPos = transform.position + _decorBasePoses[i];
+			Vector3 decorPos = transform.position + _decor[i].initOffset;
 			decorPos += -Camera.main.transform.forward * _forwardOffset;
 
 			Vector3 toDecor = (_decor[i].transform.position - transform.position).normalized;
 			float edgeDot = Vector3.Dot(toDecor, Camera.main.transform.forward);
 
-			_decorSprite[i].enabled = edgeDot < 0.6f;
+			_decor[i].spriteRenderer.enabled = edgeDot < 0.6f;
 
-			_decor[i].forward = -Camera.main.transform.forward;
-			_decor[i].up = Vector3.Lerp(toDecor, Camera.main.transform.up, Mathf.Abs(edgeDot));
+			_decor[i].GetLookAtDirection().forward = -Camera.main.transform.forward;
+			_decor[i].GetLookAtDirection().up = Vector3.Lerp(toDecor, Camera.main.transform.up, Mathf.Abs(edgeDot));
 
 			_decor[i].transform.position = decorPos;
 		}

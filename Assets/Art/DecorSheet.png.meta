@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: dcb35b9457894d74fbd71ffc52ef1d80
-timeCreated: 1498726961
+timeCreated: 1498893233
 licenseType: Pro
 TextureImporter:
   fileIDToRecycleName:
@@ -12,6 +12,9 @@ TextureImporter:
     21300010: Grass
     21300012: Brush
     21300014: Dirt
+    21300016: Tree
+    21300018: Rock
+    21300020: BigRock
   serializedVersion: 4
   mipmaps:
     mipMapMode: 0
@@ -184,6 +187,45 @@ TextureImporter:
         y: 15
         width: 98
         height: 34
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Tree
+      rect:
+        serializedVersion: 2
+        x: 657
+        y: 53
+        width: 294
+        height: 387
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Rock
+      rect:
+        serializedVersion: 2
+        x: 110
+        y: 159
+        width: 88
+        height: 78
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: BigRock
+      rect:
+        serializedVersion: 2
+        x: 365
+        y: 160
+        width: 135
+        height: 123
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}

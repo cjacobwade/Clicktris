@@ -60,9 +60,6 @@ public class Block : WadeBehaviour
 	[SerializeField]
 	float _gridSlotMaxDist = 0.1f;
 
-	[SerializeField]
-	float _gridSlotOffset = 0.3f;
-
 	Coroutine _changeScaleRoutine = null;
 
 	[SerializeField]
