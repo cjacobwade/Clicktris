@@ -2,8 +2,31 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum BlockType
+{
+	Bun,
+	Red,
+	Gat,
+	Bop,
+	Bull
+}
+
 public class Block : WadeBehaviour
 {
+	InventoryPanel _inventoryPanel = null;
+	InventoryPanel GetInventory()
+	{
+		if (!_inventoryPanel)
+			_inventoryPanel = UIManager.GetPanel<InventoryPanel>();
+
+		return _inventoryPanel;
+	}
+
+	[SerializeField]
+	BlockType _blockType = BlockType.Bun;
+	public BlockType GetBlockType()
+	{ return _blockType; }
+
 	Animator[] _blockAnims = null;
 	SpriteRenderer[] _bitSprites = null;
 
@@ -63,10 +86,18 @@ public class Block : WadeBehaviour
 	LayerMask _planetLayer = 0;
 	RaycastHit _hitInfo = new RaycastHit();
 
+	Collider[] _childColliders = null;
+	public Collider[] GetChildColliders()
+	{ return _childColliders; }
+
 	Dictionary<SpriteRenderer, BitSlotWidget> _spriteToSlotMap = new Dictionary<SpriteRenderer, BitSlotWidget>();
+	public Dictionary<SpriteRenderer, BitSlotWidget> GetSpriteToSlotMap()
+	{ return _spriteToSlotMap; }
 
 	void Awake()
 	{
+		_childColliders = GetComponentsInChildren<Collider>();
+
 		_groundShadow = GetComponent<GroundShadow>();
 		_planetLayer = 1 << LayerMask.NameToLayer("Planet");
 
@@ -141,8 +172,7 @@ public class Block : WadeBehaviour
 			Vector3 rotatePivotOffset = _rotatePivot.position - transform.position;
 			transform.position = worldPos + Camera.main.transform.forward * _selectedCamOffset - rotatePivotOffset;
 
-			InventoryPanel inventoryPanel = UIManager.GetPanel<InventoryPanel>();
-			bool uiOverlap = RectTransformUtility.RectangleContainsScreenPoint(inventoryPanel.GetInventoryRect(), mousePos, Camera.main);
+			bool uiOverlap = RectTransformUtility.RectangleContainsScreenPoint(GetInventory().GetInventoryRect(), mousePos, Camera.main);
 			if (uiOverlap != _prevUIOverlap)
 			{
 				if (_changeScaleRoutine != null)
@@ -160,7 +190,7 @@ public class Block : WadeBehaviour
 					_groundShadow.SetPos(_hitInfo.point);
 			}
 
-			bool leftOverlap = RectTransformUtility.RectangleContainsScreenPoint(inventoryPanel.GetLeftRotateRect(), mousePos, Camera.main);
+			bool leftOverlap = RectTransformUtility.RectangleContainsScreenPoint(GetInventory().GetLeftRotateRect(), mousePos, Camera.main);
 			if (leftOverlap != _prevLeftOverlap)
 			{
 				if (leftOverlap)
@@ -174,7 +204,7 @@ public class Block : WadeBehaviour
 				_prevLeftOverlap = leftOverlap;
 			}
 
-			bool rightOverlap = RectTransformUtility.RectangleContainsScreenPoint(inventoryPanel.GetRightRotateRect(), mousePos, Camera.main);
+			bool rightOverlap = RectTransformUtility.RectangleContainsScreenPoint(GetInventory().GetRightRotateRect(), mousePos, Camera.main);
 			if (rightOverlap != _prevRightOverlap)
 			{
 				if (rightOverlap)
@@ -189,15 +219,15 @@ public class Block : WadeBehaviour
 			}
 
 			_spriteToSlotMap.Clear();
-			BitSlotWidget[] bitSlots = UIManager.GetPanel<InventoryPanel>().GetBitSlots();
-			for (int i = 0; i < bitSlots.Length; i++)
+			List<BitSlotWidget> bitSlots = GetInventory().GetBitSlots();
+			for (int i = 0; i < bitSlots.Count; i++)
 				bitSlots[i].SetHighlight(false);
 
 			for (int i = 0; i < _bitSprites.Length; i++)
 			{
 				SpriteRenderer bitSprite = _bitSprites[i];
 				Vector3 spriteViewPos = Camera.main.WorldToViewportPoint(bitSprite.transform.position);
-				for (int j = 0; j < bitSlots.Length; j++)
+				for (int j = 0; j < bitSlots.Count; j++)
 				{
 					BitSlotWidget bitSlot = bitSlots[j];
 					if (!bitSlot.used)
@@ -229,28 +259,14 @@ public class Block : WadeBehaviour
 			CameraOrbit.inputFreeLens.RemoveRequestsWithContext(this);
 			_activeInputLens = null;
 
-			BitSlotWidget[] bitSlots = UIManager.GetPanel<InventoryPanel>().GetBitSlots();
-			for (int i = 0; i < bitSlots.Length; i++)
+			List<BitSlotWidget> bitSlots = GetInventory().GetBitSlots();
+			for (int i = 0; i < bitSlots.Count; i++)
 				bitSlots[i].SetHighlight(false);
 
 			bool allMatched = _spriteToSlotMap.Count == _bitSprites.Length;
 			if (allMatched)
 			{
-				foreach (var kvp in _spriteToSlotMap)
-				{
-					BitSlotWidget slot = kvp.Value;
-					slot.used = true;
-
-					SpriteRenderer sprite = kvp.Key;
-					GameObject spriteParent = new GameObject("SpriteHolder");
-					sprite.transform.SetParent(spriteParent.transform);
-					sprite.transform.localPosition = Vector3.zero;
-
-					spriteParent.transform.SetParent(Camera.main.transform);
-					spriteParent.transform.localScale = transform.localScale;
-					spriteParent.transform.position = slot.transform.position + -Camera.main.transform.forward * _gridSlotOffset;
-				}
-
+				GetInventory().AssignBlock(this);
 				Destroy(gameObject);
 			}
 			else
@@ -262,8 +278,7 @@ public class Block : WadeBehaviour
 				screenMax -= screenBoundDiff * 0.001f;
 				Vector3 mousePos = ((Vector3)WadeUtils.Clamp((Vector2)Input.mousePosition, screenMin, screenMax)).SetZ(Input.mousePosition.z);
 
-				InventoryPanel inventoryPanel = UIManager.GetPanel<InventoryPanel>();
-				bool uiOverlap = RectTransformUtility.RectangleContainsScreenPoint(inventoryPanel.GetInventoryRect(), mousePos, Camera.main);
+				bool uiOverlap = RectTransformUtility.RectangleContainsScreenPoint(GetInventory().GetInventoryRect(), mousePos, Camera.main);
 				if(!uiOverlap)
 				{
 					Vector3 worldPos = Camera.main.ScreenToWorldPoint(mousePos);
@@ -321,6 +336,7 @@ public class Block : WadeBehaviour
 		for (int i = 0; i < _bitSprites.Length; i++)
 			_bitSprites[i].sortingOrder = _worldLayerOrder;
 
+		_groundShadow.GetShadow().gameObject.SetActive(true);
 		_groundShadow.enabled = true;
 
 		_dropRoutine = null;

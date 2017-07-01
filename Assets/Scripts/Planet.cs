@@ -56,8 +56,7 @@ public class Planet : Singleton<Planet>
 
 		for(int i = 0; i < _numDudes; i++)
 		{
-			int dudeIndex = Random.Range(0, _dudePrefabs.Length);
-			Dude dude = Instantiate<Dude>(_dudePrefabs[dudeIndex], transform);
+			Dude dude = Instantiate<Dude>(_dudePrefabs[i], transform);
 			dude.transform.position = GetNearestSurfacePos(transform.position + Random.insideUnitSphere);
 
 			_dudes.Add(dude);

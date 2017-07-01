@@ -13,8 +13,6 @@ public class GroundShadow : WadeBehaviour
 
 	[SerializeField]
 	float _groundOffset = 0.1f;
-	public float GetGroundOffset()
-	{ return _groundOffset; }
 
 	void Awake()
 	{

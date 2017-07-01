@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: 5e002716cef176347a54cc1d44ad5484
+timeCreated: 1482297333
+licenseType: Pro
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Rolling No One
+  fontNames:
+  - Rolling No One
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

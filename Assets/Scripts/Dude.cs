@@ -45,12 +45,15 @@ public class Dude : WadeBehaviour
 	[SerializeField]
 	float _blockGroundOffset = 0.15f;
 
+	ParticleSystem _heartVFX = null;
+
 	Coroutine _goToTargetRoutine = null;
 
 	Vector3 _prevPos = Vector3.zero;
 
 	void Start()
 	{
+		_heartVFX = GetComponentInChildren<ParticleSystem>();
 		_spriteRenderer = GetComponentInChildren<SpriteRenderer>();
 		_animator = GetComponentInChildren<Animator>();
 
@@ -84,8 +87,12 @@ public class Dude : WadeBehaviour
 
 	void OnMouseDown()
 	{
+		_heartVFX.Emit(1);
+
 		if (++_numClicks > _clicksToDrop)
 		{
+			_heartVFX.Emit(9);
+
 			Block block = Instantiate<Block>(_blockPrefab, Planet.instance.transform);
 			StartCoroutine(DropBlockRoutine(block));
 
@@ -104,7 +111,8 @@ public class Dude : WadeBehaviour
 
 	IEnumerator DropBlockRoutine(Block block)
 	{
-		block.collider.enabled = false;
+		for(int i = 0; i < block.GetChildColliders().Length; i++)
+			block.GetChildColliders()[i].enabled = false;
 
 		Vector3 startPos = transform.position;
 
@@ -128,7 +136,8 @@ public class Dude : WadeBehaviour
 			yield return null;
 		}
 
-		block.collider.enabled = true;
+		for (int i = 0; i < block.GetChildColliders().Length; i++)
+			block.GetChildColliders()[i].enabled = true;
 	}
 
 	IEnumerator GoToTargetRoutine()

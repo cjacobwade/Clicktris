@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: a850aefad7335854ab0fdd6fbea4a112
-timeCreated: 1498796603
+timeCreated: 1498876822
 licenseType: Pro
 TextureImporter:
   fileIDToRecycleName:
@@ -20,6 +20,7 @@ TextureImporter:
     21300026: RedSquare
     21300028: BullSquare
     21300030: Shadow
+    21300032: Heart
   serializedVersion: 4
   mipmaps:
     mipMapMode: 0
@@ -231,6 +232,19 @@ TextureImporter:
         y: 794
         width: 238
         height: 230
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Heart
+      rect:
+        serializedVersion: 2
+        x: 290
+        y: 880
+        width: 81
+        height: 66
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
