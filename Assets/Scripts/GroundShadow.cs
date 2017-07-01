@@ -8,9 +8,13 @@ public class GroundShadow : WadeBehaviour
 	SpriteRenderer _shadowPrefab = null;
 
 	SpriteRenderer _shadow = null;
+	public SpriteRenderer GetShadow()
+	{ return _shadow; }
 
 	[SerializeField]
 	float _groundOffset = 0.1f;
+	public float GetGroundOffset()
+	{ return _groundOffset; }
 
 	void Awake()
 	{
@@ -19,7 +23,12 @@ public class GroundShadow : WadeBehaviour
 
 	void Update()
 	{
-		_shadow.transform.position = Planet.GetNearestSurfacePos(transform.position) + Planet.GetNormalAtPosition(transform.position) * _groundOffset;
+		SetPos(transform.position);
+	}
+
+	public void SetPos(Vector3 pos)
+	{
+		_shadow.transform.position = Planet.GetNearestSurfacePos(pos) + Planet.GetNormalAtPosition(pos) * _groundOffset;
 		_shadow.transform.LookAt(_shadow.transform.position + Planet.GetNormalAtPosition(_shadow.transform.position));
 	}
 }

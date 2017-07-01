@@ -11,6 +11,16 @@ public class InventoryPanel : PanelBase
 	public RectTransform GetInventoryRect()
 	{ return _inventoryRect; }
 
+	[SerializeField]
+	RectTransform _leftRotateRect = null;
+	public RectTransform GetLeftRotateRect()
+	{ return _leftRotateRect; }
+
+	[SerializeField]
+	RectTransform _rightRotateRect = null;
+	public RectTransform GetRightRotateRect()
+	{ return _rightRotateRect; }
+
 	BitSlotWidget[] _bitSlots = null;
 	public BitSlotWidget[] GetBitSlots()
 	{ return _bitSlots; }
