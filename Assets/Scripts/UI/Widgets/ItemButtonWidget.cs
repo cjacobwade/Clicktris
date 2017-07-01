@@ -73,7 +73,9 @@ public class ItemButtonWidget : WadeBehaviour
 	IEnumerator SlotTweenRoutine()
 	{
 		Vector3 startPosition = transform.position;
-		Vector3 startScale = transform.localScale;
+		Vector3 startScale = transform.localScale * 2f;
+
+		_slamTween.enabled = false;
 
 		float timer = 0f;
 		while(timer < _flyToSlotTime)
@@ -82,10 +84,13 @@ public class ItemButtonWidget : WadeBehaviour
 
 			float alpha = timer / _flyToSlotTime;
 			transform.position = Vector3.Lerp(startPosition, _itemSlot.transform.position, _slotTweenPosCurve.Evaluate(alpha));
-			transform.localScale = Vector3.Lerp(startScale, Vector3.one, _slotTweenScaleCurve.Evaluate(alpha));
+			transform.localScale = Vector3.LerpUnclamped(startScale, Vector3.one, _slotTweenScaleCurve.Evaluate(alpha));
 
 			yield return null;
 		}
+
+		_slamTween.enabled = true;
+		_slamTween.Play();
 
 		transform.SetParent(_itemSlot.transform);
 	}
