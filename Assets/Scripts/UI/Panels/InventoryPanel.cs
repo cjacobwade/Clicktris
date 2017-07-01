@@ -30,6 +30,9 @@ public class InventoryPanel : PanelBase
 	public List<BitSlotWidget> GetBitSlots()
 	{ return _bitSlots; }
 
+	List<ItemSlotWidget> _itemSlots = new List<ItemSlotWidget>();
+	ItemButtonWidget[] _itemButtonPrefabs = null;
+
 	[SerializeField]
 	Button _combineButton = null;
 
@@ -45,6 +48,9 @@ public class InventoryPanel : PanelBase
 	void Awake()
 	{
 		_bitSlots = _inventoryRect.GetComponentsInChildren<BitSlotWidget>().ToList();
+
+		_itemButtonPrefabs = Resources.LoadAll<ItemButtonWidget>("Items");
+		_itemSlots = GetComponentsInChildren<ItemSlotWidget>().ToList();
 
 		_gridSpritesRoot = new GameObject("GridSpritesRoot").transform;
 		_gridSpritesRoot.SetParent(Camera.main.transform);
@@ -82,6 +88,19 @@ public class InventoryPanel : PanelBase
 		_combineButton.gameObject.SetActive(false);
 
 		// TODO: Calculate what item we need to give here
+
+		ItemButtonWidget itemButton = Instantiate<ItemButtonWidget>(_itemButtonPrefabs.Random(), _inventoryRect);
+		itemButton.transform.ResetLocals();
+
+		for(int i = 0; i < _itemSlots.Count; i++)
+		{
+			if(!_itemSlots[i].used)
+			{
+				_itemSlots[i].used = true;
+				itemButton.FlyToSlot(_itemSlots[i]);
+				break;
+			}
+		}
 
 		_addedBlockTypes.Clear();
 

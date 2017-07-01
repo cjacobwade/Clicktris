@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: a850aefad7335854ab0fdd6fbea4a112
-timeCreated: 1498902576
+timeCreated: 1498916962
 licenseType: Pro
 TextureImporter:
   fileIDToRecycleName:
@@ -31,7 +31,7 @@ TextureImporter:
     21300048: EmbiggenIcon
     21300050: LockBlockIcon
     21300052: Dome
-    21300054: DudeSheet_0
+    21300054: FlipIcon
     21300056: RedGold
     21300058: BopGold
     21300060: BunGold
@@ -470,6 +470,19 @@ TextureImporter:
         y: 812
         width: 120
         height: 120
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: FlipIcon
+      rect:
+        serializedVersion: 2
+        x: 448
+        y: 882
+        width: 140
+        height: 140
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}

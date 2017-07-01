@@ -128,7 +128,7 @@ public class Dude : WadeBehaviour
 		_heartVFX.Emit(CameraOrbit.GetClickStrength());
 
 		_numClicks += CameraOrbit.GetClickStrength();
-		if (_numClicks > _clicksToDrop)
+		if (_numClicks > _clicksToDrop + numEnlarges * _clicksToDrop * 0.75f)
 		{
 			_heartVFX.Emit(10);
 
@@ -222,22 +222,21 @@ public class Dude : WadeBehaviour
 		float targetDist = Vector3.Distance(Planet.GetNearestSurfacePos(transform.position), _targetPos);
 		while(targetDist > _maxReachTargetDist)
 		{
-			Vector3 currentNormal = Planet.GetNormalAtPosition(transform.position);
-			Vector3 targetNormal = Planet.GetNormalAtPosition(_targetPos);
-
-			Vector3 axis = transform.InverseTransformDirection(Vector3.Cross(currentNormal, targetNormal));
-			float angle = Vector3.Angle(currentNormal, targetNormal);
+			Vector3 normal = Planet.GetNormalAtPosition(transform.position);
+			Vector3 toTarget = _targetPos - transform.position;
+			Vector3 right = Vector3.Cross(normal, toTarget.normalized);
+			Vector3 tangent = Vector3.Cross(right, normal);
 
 			// Need to subtract out movement caused by camera orbit
 			Vector2 camScreenDelta = Camera.main.WorldToScreenPoint(transform.position) - Camera.main.WorldToScreenPoint(_prevPos);
 
-			transform.RotateAround(Planet.instance.transform.position, axis, Mathf.Min(angle, _moveSpeed * Time.deltaTime));
+			transform.position += tangent * Mathf.Min(toTarget.magnitude, _moveSpeed * Time.deltaTime);
+			transform.position = Planet.GetNearestSurfacePos(transform.position) + Planet.GetNormalAtPosition(transform.position) * _groundOffset;
 
 			Vector2 screenDelta = Camera.main.WorldToScreenPoint(transform.position) - Camera.main.WorldToScreenPoint(_prevPos);
 			screenDelta -= camScreenDelta;
 
 			spriteRenderer.flipX = screenDelta.x > 0f;
-
 			_prevPos = transform.position;
 
 			yield return null;

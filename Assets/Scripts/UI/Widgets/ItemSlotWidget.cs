@@ -4,13 +4,6 @@ using UnityEngine;
 
 public class ItemSlotWidget : WadeBehaviour
 {
-	void Awake ()
-	{
-		
-	}
-	
-	void Update ()
-	{
-		
-	}
+	[HideInInspector]
+	public bool used = false;
 }
