@@ -112,6 +112,9 @@ public class Block : WadeBehaviour
 
 	float _lastTouchTime = 0f;
 
+	[SerializeField, Range(-1f, 1f)]
+	float _cullDot = 0.1f;
+
 	Collider[] _childColliders = null;
 	public Collider[] GetChildColliders()
 	{ return _childColliders; }
@@ -141,10 +144,11 @@ public class Block : WadeBehaviour
 		if (_activeInputLens == null)
 		{
 			Vector3 toBlock = (transform.position - Planet.instance.transform.position).normalized;
-			float edgeDot = Vector3.Dot(toBlock, Camera.main.transform.forward);
+			Vector3 toCamera = (GetInventory().GetViewRect().transform.position - Planet.instance.transform.position).normalized;
+			float edgeDot = Vector3.Dot(toBlock, toCamera);
 
 			for (int i = 0; i < _bitSprites.Length; i++)
-				_bitSprites[i].enabled = edgeDot < 0.7f;
+				_bitSprites[i].enabled = edgeDot > _cullDot;
 		}
 		else
 		{

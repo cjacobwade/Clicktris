@@ -70,6 +70,9 @@ public class Dude : WadeBehaviour
 
 	Vector3 _prevPos = Vector3.zero;
 
+	[SerializeField, Range(-1f, 1f)]
+	float _cullDot = 0.1f;
+
 	void Start()
 	{
 		_heartVFX = GetComponentInChildren<ParticleSystem>();
@@ -91,9 +94,10 @@ public class Dude : WadeBehaviour
 			SetTargetPos(transform.position + Random.insideUnitSphere * _wanderDist);
 
 		Vector3 toDude = (transform.position - Planet.instance.transform.position).normalized;
-		float edgeDot = Vector3.Dot(toDude, Camera.main.transform.forward);
-		_spriteRenderer.enabled = edgeDot < 0.6f;
-		_shadow.GetShadow().enabled = edgeDot < 0.6f;
+		Vector3 toCamera = (UIManager.GetPanel<InventoryPanel>().GetViewRect().position - Planet.instance.transform.position).normalized;
+		float edgeDot = Vector3.Dot(toDude, toCamera);
+		_spriteRenderer.enabled = edgeDot > _cullDot;
+		_shadow.GetShadow().enabled = edgeDot > _cullDot;
 	}
 
 	void SetTargetPos(Vector3 targetPos)

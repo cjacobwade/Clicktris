@@ -12,6 +12,11 @@ public class InventoryPanel : PanelBase
 	{ return _inventoryRect; }
 
 	[SerializeField]
+	RectTransform _viewRect = null;
+	public RectTransform GetViewRect()
+	{ return _viewRect; }
+
+	[SerializeField]
 	RectTransform _leftRotateRect = null;
 	public RectTransform GetLeftRotateRect()
 	{ return _leftRotateRect; }

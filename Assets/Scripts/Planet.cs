@@ -26,6 +26,9 @@ public class Planet : Singleton<Planet>
 	[SerializeField]
 	float _noiseScale = 5f;
 
+	[SerializeField, Range(-1f, 1f)]
+	float _cullDot = 0.1f;
+
 	void Awake()
 	{
 		_decorPrefabs = Resources.LoadAll<Decor>("Decor").ToList();
@@ -87,15 +90,16 @@ public class Planet : Singleton<Planet>
 
 	void Update()
 	{
-		for(int i = 0; i < _decor.Count; i++)
+		Vector3 toCamera = (UIManager.GetPanel<InventoryPanel>().GetViewRect().position - transform.position).normalized;
+		for (int i = 0; i < _decor.Count; i++)
 		{
 			Vector3 decorPos = transform.position + _decor[i].initOffset;
 			decorPos += -Camera.main.transform.forward * _forwardOffset;
 
 			Vector3 toDecor = (_decor[i].transform.position - transform.position).normalized;
-			float edgeDot = Vector3.Dot(toDecor, Camera.main.transform.forward);
+			float edgeDot = Vector3.Dot(toDecor, toCamera);
 
-			_decor[i].spriteRenderer.enabled = edgeDot < 0.6f;
+			_decor[i].spriteRenderer.enabled = edgeDot > _cullDot;
 
 			_decor[i].GetLookAtDirection().forward = -Camera.main.transform.forward;
 			_decor[i].GetLookAtDirection().up = Vector3.Lerp(toDecor, Camera.main.transform.up, Mathf.Abs(edgeDot));
