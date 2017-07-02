@@ -2,13 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 using LinqTools;
+using UnityEngine.EventSystems;
 
-public class SpawnDudeItem : CastItem
+public class SpawnDudeItem : CastPreviewItem
 {
 	[SerializeField]
 	BlockType _dudeType = BlockType.Random;
 
 	Dude _dudePrefab = null;
+
+	protected override GameObject GetPreviewPrefab()
+	{ return _dudePrefab.gameObject; }
 
 	void Awake()
 	{

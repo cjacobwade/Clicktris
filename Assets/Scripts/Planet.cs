@@ -8,6 +8,13 @@ public class Planet : Singleton<Planet>
 	List<Decor> _decorPrefabs = new List<Decor>();
 	List<Decor> _decor = new List<Decor>();
 
+	public static void RegisterDecor(Decor decor)
+	{ instance._decor.Add(decor); }
+
+	public static void DeregisterDecor(Decor decor)
+	{ instance._decor.Remove(decor); }
+
+
 	Dude[] _dudePrefabs = null;
 	List<Dude> _dudes = new List<Dude>();
 
@@ -71,7 +78,6 @@ public class Planet : Singleton<Planet>
 
 		decor.transform.position = spawnPos.Value;
 		decor.initOffset = spawnPos.Value - instance.transform.position;
-		instance._decor.Add(decor);
 	}
 	
 	public static Dude SpawnDude(Dude dudePrefab, Vector3? spawnPos = null)

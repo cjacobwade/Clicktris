@@ -25,5 +25,12 @@ public class Decor : WadeBehaviour
 	{
 		_spriteRenderer = GetComponentInChildren<SpriteRenderer>();
 		_lookAtDirection = GetComponent<LookAtDirection>();
+
+		Planet.RegisterDecor(this);
+	}
+
+	void OnDestroy()
+	{
+		Planet.DeregisterDecor(this);
 	}
 }

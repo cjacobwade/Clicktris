@@ -5,21 +5,21 @@ using UnityEngine.EventSystems;
 
 public abstract class CastItem : WadeBehaviour, IPointerDownHandler, IPointerClickHandler, IPointerExitHandler
 {
-	bool _down = false;
-	bool _dragging = false;
-	bool _toggled = false;
+	protected bool _down = false;
+	protected bool _dragging = false;
+	protected bool _toggled = false;
 
-	RaycastHit _hitInfo = new RaycastHit();
+	protected RaycastHit _hitInfo = new RaycastHit();
 
 	[SerializeField]
-	LayerMask _rayLayer = 0;
+	protected LayerMask _rayLayer = 0;
 
 	protected virtual bool CanApply(RaycastHit hitInfo)
 	{ return true; }
 
 	protected abstract void ApplyEffect(RaycastHit hitInfo);
 
-	void Update()
+	protected virtual void Update()
 	{
 		if (_toggled && Input.GetMouseButtonDown(0))
 		{
@@ -34,7 +34,7 @@ public abstract class CastItem : WadeBehaviour, IPointerDownHandler, IPointerCli
 			transform.position = Camera.main.ScreenToWorldPoint(Input.mousePosition) + Camera.main.transform.forward * 5f;
 	}
 
-	void Fire()
+	protected virtual void Fire()
 	{
 		Vector3 rayPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 		if (Physics.Raycast(rayPos, Camera.main.transform.forward, out _hitInfo, Mathf.Infinity, _rayLayer, QueryTriggerInteraction.Ignore) && CanApply(_hitInfo))
@@ -56,7 +56,7 @@ public abstract class CastItem : WadeBehaviour, IPointerDownHandler, IPointerCli
 		CameraOrbit.unlockedLens.AddRequest(new LensHandle<bool>(this, false));
 	}
 
-	public void OnPointerClick(PointerEventData eventData)
+	public virtual void OnPointerClick(PointerEventData eventData)
 	{
 		if (_dragging)
 			Fire();
