@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public abstract class CastItem : WadeBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerClickHandler, IPointerExitHandler
+public abstract class CastItem : WadeBehaviour, IPointerDownHandler, IPointerClickHandler, IPointerExitHandler
 {
 	bool _down = false;
 	bool _dragging = false;
@@ -13,6 +13,11 @@ public abstract class CastItem : WadeBehaviour, IPointerDownHandler, IPointerUpH
 
 	[SerializeField]
 	LayerMask _rayLayer = 0;
+
+	protected virtual bool CanApply(RaycastHit hitInfo)
+	{ return true; }
+
+	protected abstract void ApplyEffect(RaycastHit hitInfo);
 
 	void Update()
 	{
@@ -24,6 +29,9 @@ public abstract class CastItem : WadeBehaviour, IPointerDownHandler, IPointerUpH
 			_down = false;
 			_dragging = false;
 		}
+
+		if (_down && _dragging)
+			transform.position = Camera.main.ScreenToWorldPoint(Input.mousePosition) + Camera.main.transform.forward * 5f;
 	}
 
 	void Fire()
@@ -34,15 +42,12 @@ public abstract class CastItem : WadeBehaviour, IPointerDownHandler, IPointerUpH
 			ApplyEffect(_hitInfo);
 			Destroy(gameObject);
 		}
+		else
+			transform.localPosition = Vector3.zero;
 
 		CameraOrbit.inputFreeLens.RemoveRequestsWithContext(this);
 		CameraOrbit.unlockedLens.RemoveRequestsWithContext(this);
 	}
-
-	protected virtual bool CanApply(RaycastHit hitInfo)
-	{ return true; }
-
-	protected abstract void ApplyEffect(RaycastHit hitInfo);
 
 	public void OnPointerDown(PointerEventData eventData)
 	{
@@ -51,24 +56,21 @@ public abstract class CastItem : WadeBehaviour, IPointerDownHandler, IPointerUpH
 		CameraOrbit.unlockedLens.AddRequest(new LensHandle<bool>(this, false));
 	}
 
-	public void OnPointerUp(PointerEventData eventData)
+	public void OnPointerClick(PointerEventData eventData)
 	{
 		if (_dragging)
 			Fire();
+		else
+		{
+			CameraOrbit.inputFreeLens.AddRequest(new LensHandle<bool>(this, false));
+			CameraOrbit.unlockedLens.AddRequest(new LensHandle<bool>(this, false));
+			_toggled = true;
+		}
 
 		_down = false;
 		_dragging = false;
 	}
 
-	// Happens if press/release while on the button
-	public void OnPointerClick(PointerEventData eventData)
-	{
-		CameraOrbit.inputFreeLens.AddRequest(new LensHandle<bool>(this, false));
-		CameraOrbit.unlockedLens.AddRequest(new LensHandle<bool>(this, false));
-		_toggled = true;
-	}
-
-	// Happens if mouse goes off of button, whether down or not
 	public void OnPointerExit(PointerEventData eventData)
 	{
 		if (_down)

@@ -38,10 +38,6 @@ public class InventoryPanel : PanelBase
 
 	List<BlockType> _addedBlockTypes = new List<BlockType>();
 
-	Transform _gridSpritesRoot = null;
-	public Transform GetGridSpriteRoot()
-	{ return _gridSpritesRoot; }
-
 	[SerializeField]
 	FloatRange _slotOffsetRange = new FloatRange(0.25f, 0.3f);
 
@@ -51,9 +47,6 @@ public class InventoryPanel : PanelBase
 
 		_itemButtonPrefabs = Resources.LoadAll<ItemButtonWidget>("Items");
 		_itemSlots = GetComponentsInChildren<ItemSlotWidget>().ToList();
-
-		_gridSpritesRoot = new GameObject("GridSpritesRoot").transform;
-		_gridSpritesRoot.SetParent(Camera.main.transform);
 
 		_combineButton.gameObject.SetActive(false);
 	}
@@ -66,8 +59,8 @@ public class InventoryPanel : PanelBase
 			slot.used = true;
 
 			Transform spriteParent = new GameObject(gameObject.name + "SpriteRoot").transform;
-			spriteParent.SetParent(GetGridSpriteRoot());
 			spriteParent.localScale = block.transform.localScale;
+			spriteParent.SetParent(slot.transform);
 
 			float slotAlpha = _bitSlots.IndexOf(slot) / (float)_bitSlots.Count;
 			spriteParent.position = slot.transform.position + -Camera.main.transform.forward * _slotOffsetRange.Lerp(slotAlpha);
@@ -75,6 +68,7 @@ public class InventoryPanel : PanelBase
 			SpriteRenderer sprite = kvp.Key;
 			sprite.transform.SetParent(spriteParent);
 			sprite.transform.localPosition = Vector3.zero;
+			sprite.GetComponent<Collider>().enabled = false;
 		}
 
 		_addedBlockTypes.Add(block.GetBlockType());
@@ -105,9 +99,11 @@ public class InventoryPanel : PanelBase
 		_addedBlockTypes.Clear();
 
 		for (int i = 0; i < _bitSlots.Count; i++)
+		{
 			_bitSlots[i].used = false;
 
-		foreach (Transform child in _gridSpritesRoot)
-			Destroy(child.gameObject);
+			foreach (Transform child in _bitSlots[i].transform)
+				Destroy(child.gameObject);
+		}
 	}
 }

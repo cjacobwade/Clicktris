@@ -11,7 +11,10 @@ public class FlipItem : WadeBehaviour, IPointerClickHandler
 		if (blocks.Length > 0)
 		{
 			for (int i = 0; i < blocks.Length; i++)
-				blocks[i].GetRotatePivot().localScale = blocks[i].GetRotatePivot().localScale.SetX(-1);
+			{
+				Transform blockPivot = blocks[i].GetRotatePivot();
+				blockPivot.localScale = blockPivot.localScale.SetX(blockPivot.localScale.x * -1f);
+			}
 
 			Destroy(gameObject);
 		}
