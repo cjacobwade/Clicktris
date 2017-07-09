@@ -14,13 +14,13 @@ public enum BlockType
 
 public class Block : WadeBehaviour
 {
-	InventoryPanel _inventoryPanel = null;
-	InventoryPanel GetInventory()
+	BreedPanel _breedPanel = null;
+	BreedPanel GetBreed()
 	{
-		if (!_inventoryPanel)
-			_inventoryPanel = UIManager.GetPanel<InventoryPanel>();
+		if (!_breedPanel)
+			_breedPanel = UIManager.GetPanel<BreedPanel>();
 
-		return _inventoryPanel;
+		return _breedPanel;
 	}
 
 	[SerializeField]
@@ -144,7 +144,7 @@ public class Block : WadeBehaviour
 		if (_activeInputLens == null)
 		{
 			Vector3 toBlock = (transform.position - Planet.instance.transform.position).normalized;
-			Vector3 toCamera = (GetInventory().GetViewRect().transform.position - Planet.instance.transform.position).normalized;
+			Vector3 toCamera = (GetBreed().GetViewRect().transform.position - Planet.instance.transform.position).normalized;
 			float edgeDot = Vector3.Dot(toBlock, toCamera);
 
 			for (int i = 0; i < _bitSprites.Length; i++)
@@ -184,11 +184,13 @@ public class Block : WadeBehaviour
 			screenMax -= (screenMax - screenMin) * 0.001f;
 			Vector3 mousePos = ((Vector3)WadeUtils.Clamp((Vector2)Input.mousePosition, screenMin, screenMax)).SetZ(Input.mousePosition.z);
 
-			InventoryPanel inventoryPanel = UIManager.GetPanel<InventoryPanel>();
-			inventoryPanel.GetLeftRotateRect().gameObject.SetActive(true);
-			inventoryPanel.GetRightRotateRect().gameObject.SetActive(true);
+			UIManager.GetPanel<SwapPanel>().OnClickBreed();
 
-			_prevUIOverlap = RectTransformUtility.RectangleContainsScreenPoint(inventoryPanel.GetInventoryRect(), mousePos, Camera.main);
+			BreedPanel breedPanel = UIManager.GetPanel<BreedPanel>();
+			breedPanel.GetLeftRotateRect().gameObject.SetActive(true);
+			breedPanel.GetRightRotateRect().gameObject.SetActive(true);
+
+			_prevUIOverlap = RectTransformUtility.RectangleContainsScreenPoint(breedPanel.GetBreedRect(), mousePos, Camera.main);
 
 			ResetFadeoutTimer();
 		}
@@ -212,7 +214,7 @@ public class Block : WadeBehaviour
 			Vector3 rotatePivotOffset = _rotatePivot.position - transform.position;
 			transform.position = worldPos + Camera.main.transform.forward * _selectedCamOffset - rotatePivotOffset;
 
-			bool uiOverlap = RectTransformUtility.RectangleContainsScreenPoint(GetInventory().GetInventoryRect(), mousePos, Camera.main);
+			bool uiOverlap = RectTransformUtility.RectangleContainsScreenPoint(GetBreed().GetBreedRect(), mousePos, Camera.main);
 			if (uiOverlap != _prevUIOverlap)
 			{
 				if (_changeScaleRoutine != null)
@@ -230,7 +232,7 @@ public class Block : WadeBehaviour
 					_groundShadow.SetPos(_hitInfo.point);
 			}
 
-			bool leftOverlap = RectTransformUtility.RectangleContainsScreenPoint(GetInventory().GetLeftRotateRect(), mousePos, Camera.main);
+			bool leftOverlap = RectTransformUtility.RectangleContainsScreenPoint(GetBreed().GetLeftRotateRect(), mousePos, Camera.main);
 			if (leftOverlap != _prevLeftOverlap)
 			{
 				if (leftOverlap)
@@ -244,7 +246,7 @@ public class Block : WadeBehaviour
 				_prevLeftOverlap = leftOverlap;
 			}
 
-			bool rightOverlap = RectTransformUtility.RectangleContainsScreenPoint(GetInventory().GetRightRotateRect(), mousePos, Camera.main);
+			bool rightOverlap = RectTransformUtility.RectangleContainsScreenPoint(GetBreed().GetRightRotateRect(), mousePos, Camera.main);
 			if (rightOverlap != _prevRightOverlap)
 			{
 				if (rightOverlap)
@@ -259,7 +261,7 @@ public class Block : WadeBehaviour
 			}
 
 			_spriteToSlotMap.Clear();
-			List<BitSlotWidget> bitSlots = GetInventory().GetBitSlots();
+			List<BitSlotWidget> bitSlots = GetBreed().GetBitSlots();
 			for (int i = 0; i < bitSlots.Count; i++)
 				bitSlots[i].SetHighlight(false);
 
@@ -301,7 +303,7 @@ public class Block : WadeBehaviour
 			CameraOrbit.inputFreeLens.RemoveRequestsWithContext(this);
 			_activeInputLens = null;
 
-			List<BitSlotWidget> bitSlots = GetInventory().GetBitSlots();
+			List<BitSlotWidget> bitSlots = GetBreed().GetBitSlots();
 			for (int i = 0; i < bitSlots.Count; i++)
 				bitSlots[i].SetHighlight(false);
 
@@ -310,7 +312,7 @@ public class Block : WadeBehaviour
 			bool allMatched = _spriteToSlotMap.Count == _bitSprites.Length;
 			if (allMatched)
 			{
-				GetInventory().AssignBlock(this);
+				GetBreed().AssignBlock(this);
 				Destroy(gameObject);
 			}
 			else
@@ -322,7 +324,7 @@ public class Block : WadeBehaviour
 				screenMax -= screenBoundDiff * 0.001f;
 				Vector3 mousePos = ((Vector3)WadeUtils.Clamp((Vector2)Input.mousePosition, screenMin, screenMax)).SetZ(Input.mousePosition.z);
 
-				bool uiOverlap = RectTransformUtility.RectangleContainsScreenPoint(GetInventory().GetInventoryRect(), mousePos, Camera.main);
+				bool uiOverlap = RectTransformUtility.RectangleContainsScreenPoint(GetBreed().GetBreedRect(), mousePos, Camera.main);
 				if(!uiOverlap)
 				{
 					Vector3 worldPos = Camera.main.ScreenToWorldPoint(mousePos);
@@ -337,9 +339,9 @@ public class Block : WadeBehaviour
 				_dropRoutine = StartCoroutine(DropRoutine());
 			}
 
-			InventoryPanel inventoryPanel = UIManager.GetPanel<InventoryPanel>();
-			inventoryPanel.GetLeftRotateRect().gameObject.SetActive(true);
-			inventoryPanel.GetRightRotateRect().gameObject.SetActive(true);
+			BreedPanel breedPanel = UIManager.GetPanel<BreedPanel>();
+			breedPanel.GetLeftRotateRect().gameObject.SetActive(false);
+			breedPanel.GetRightRotateRect().gameObject.SetActive(false);
 		}
 	}
 

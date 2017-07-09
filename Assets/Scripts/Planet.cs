@@ -96,7 +96,7 @@ public class Planet : Singleton<Planet>
 
 	void Update()
 	{
-		Vector3 toCamera = (UIManager.GetPanel<InventoryPanel>().GetViewRect().position - transform.position).normalized;
+		Vector3 toCamera = (UIManager.GetPanel<BreedPanel>().GetViewRect().position - transform.position).normalized;
 		for (int i = 0; i < _decor.Count; i++)
 		{
 			Vector3 decorPos = transform.position + _decor[i].initOffset;

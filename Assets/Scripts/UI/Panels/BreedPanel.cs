@@ -4,12 +4,12 @@ using UnityEngine;
 using UnityEngine.UI;
 using LinqTools;
 
-public class InventoryPanel : PanelBase
+public class BreedPanel : PanelBase
 {
 	[SerializeField]
-	RectTransform _inventoryRect = null;
-	public RectTransform GetInventoryRect()
-	{ return _inventoryRect; }
+	RectTransform _breedRect = null;
+	public RectTransform GetBreedRect()
+	{ return _breedRect; }
 
 	[SerializeField]
 	RectTransform _viewRect = null;
@@ -43,7 +43,7 @@ public class InventoryPanel : PanelBase
 
 	void Awake()
 	{
-		_bitSlots = _inventoryRect.GetComponentsInChildren<BitSlotWidget>().ToList();
+		_bitSlots = _breedRect.GetComponentsInChildren<BitSlotWidget>().ToList();
 
 		_itemButtonPrefabs = Resources.LoadAll<ItemButtonWidget>("Items");
 		_itemSlots = GetComponentsInChildren<ItemSlotWidget>().ToList();
@@ -86,7 +86,7 @@ public class InventoryPanel : PanelBase
 
 		// TODO: Calculate what item we need to give here
 
-		ItemButtonWidget itemButton = Instantiate<ItemButtonWidget>(_itemButtonPrefabs.Random(), _inventoryRect);
+		ItemButtonWidget itemButton = Instantiate<ItemButtonWidget>(_itemButtonPrefabs.Random(), _breedRect);
 		itemButton.transform.ResetLocals();
 
 		for(int i = 0; i < _itemSlots.Count; i++)

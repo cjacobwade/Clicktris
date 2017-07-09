@@ -94,7 +94,7 @@ public class Dude : WadeBehaviour
 			SetTargetPos(transform.position + Random.insideUnitSphere * _wanderDist);
 
 		Vector3 toDude = (transform.position - Planet.instance.transform.position).normalized;
-		Vector3 toCamera = (UIManager.GetPanel<InventoryPanel>().GetViewRect().position - Planet.instance.transform.position).normalized;
+		Vector3 toCamera = (UIManager.GetPanel<BreedPanel>().GetViewRect().position - Planet.instance.transform.position).normalized;
 		float edgeDot = Vector3.Dot(toDude, toCamera);
 		_spriteRenderer.enabled = edgeDot > _cullDot;
 		_shadow.GetShadow().enabled = edgeDot > _cullDot;

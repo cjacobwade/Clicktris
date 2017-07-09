@@ -23,6 +23,7 @@ public class CameraOrbit : Singleton<CameraOrbit>
 #endif
 
 	Vector2 _inputVec = Vector2.zero;
+	Vector2 _downViewPos = Vector2.zero;
 	Vector2 _prevMousePos = Vector2.zero;
 
 	LensManager<bool> _unlockedLens = new LensManager<bool>(l => LensUtils.AllTrue(l));
@@ -40,19 +41,19 @@ public class CameraOrbit : Singleton<CameraOrbit>
 	public static void AddClickStrength()
 	{ instance._clickStrength++; }
 
-	protected RaycastHit _hitInfo = new RaycastHit();
+	bool _down = false;
+	bool _drag = false;
 
 	[SerializeField]
-	protected LayerMask _rayLayer = 0;
-
-	bool _startDrag = false;
+	float _minDragThreshold = 0.17f;
 
 	PointerEventData _eventData = null;
 	List<RaycastResult> _uiHitResults = new List<RaycastResult>();
 
 	void Awake()
 	{
-		UIManager.GetPanel<InventoryPanel>().gameObject.SetActive(true);
+		UIManager.GetPanel<SwapPanel>().gameObject.SetActive(true);
+		UIManager.GetPanel<BreedPanel>().gameObject.SetActive(true);
 
 		_eventData = new PointerEventData(EventSystem.current);
 	}
@@ -66,18 +67,38 @@ public class CameraOrbit : Singleton<CameraOrbit>
 			EventSystem.current.RaycastAll(_eventData, _uiHitResults);
 
 			if (_uiHitResults.Count == 0)
-				_startDrag = true;
+			{
+				_down = true;
+				_downViewPos = Camera.main.ScreenToViewportPoint(Input.mousePosition);
+			}
 
 			_prevMousePos = Input.mousePosition;
 		}
 
 		if (Input.GetMouseButtonUp(0))
-			_startDrag = false;
+		{
+			_drag = false;
+			_down = false;
+		}
 
 		if (unlockedLens)
 		{
-			if (Input.GetMouseButton(0) && _startDrag)
-				_inputVec = ((Vector2)Input.mousePosition - _prevMousePos);
+			if (Input.GetMouseButton(0) && _down)
+			{
+				if (!_drag)
+				{
+					Vector2 viewPos = Camera.main.ScreenToViewportPoint(Input.mousePosition);
+					Vector2 viewDelta = viewPos - _downViewPos;
+					if (viewDelta.magnitude > _minDragThreshold)
+						_drag = true;
+				}
+
+				if (_drag)
+				{
+					_drag = true;
+					_inputVec = ((Vector2)Input.mousePosition - _prevMousePos);
+				}
+			}
 			else
 				_inputVec -= Vector2.ClampMagnitude(_inputVec * _decelSpeed * Time.deltaTime, _inputVec.magnitude);
 
