@@ -237,6 +237,8 @@ public class Block : WadeBehaviour
 			{
 				if (leftOverlap)
 				{
+					GameSounds.PostEvent2D(GameSound.SFX_BlockRotateCounterClockwise);
+
 					if (_rotateRoutine != null)
 						StopCoroutine(_rotateRoutine);
 
@@ -251,6 +253,8 @@ public class Block : WadeBehaviour
 			{
 				if (rightOverlap)
 				{
+					GameSounds.PostEvent2D(GameSound.SFX_BlockRotateClockwise);
+
 					if (_rotateRoutine != null)
 						StopCoroutine(_rotateRoutine);
 
@@ -317,6 +321,8 @@ public class Block : WadeBehaviour
 			}
 			else
 			{
+				GameSounds.PostEvent2D(GameSound.SFX_BlockDeny);
+
 				Vector2 screenMin = Vector2.zero;
 				Vector2 screenMax = new Vector2(Screen.width, Screen.height);
 				Vector2 screenBoundDiff = screenMax - screenMin;

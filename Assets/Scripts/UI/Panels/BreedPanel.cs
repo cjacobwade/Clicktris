@@ -74,6 +74,10 @@ public class BreedPanel : PanelBase
 			sprite.GetComponent<Collider>().enabled = false;
 		}
 
+		string soundName = "SFX_BlockPlacement" + (Mathf.Clamp(_addedBlockTypes.Count, 0, 3) + 1);
+		GameSound placeSound = (GameSound)System.Enum.Parse(typeof(GameSound), soundName);
+		GameSounds.PostEvent2D(placeSound);
+
 		_addedBlockTypes.Add(block.GetBlockType());
 
 		if(_addedBlockTypes.Count > 1)
@@ -83,6 +87,8 @@ public class BreedPanel : PanelBase
 	public void Combine()
 	{
 		_combineButton.gameObject.SetActive(false);
+
+		GameSounds.PostEvent2D(GameSound.SFX_BlockCombine);
 
 		// TODO: Calculate what item we need to give here
 
