@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 public class CameraOrbit : Singleton<CameraOrbit>
 {
@@ -38,19 +40,43 @@ public class CameraOrbit : Singleton<CameraOrbit>
 	public static void AddClickStrength()
 	{ instance._clickStrength++; }
 
+	protected RaycastHit _hitInfo = new RaycastHit();
+
+	[SerializeField]
+	protected LayerMask _rayLayer = 0;
+
+	bool _startDrag = false;
+
+	PointerEventData _eventData = null;
+	List<RaycastResult> _uiHitResults = new List<RaycastResult>();
+
 	void Awake()
 	{
 		UIManager.GetPanel<InventoryPanel>().gameObject.SetActive(true);
+
+		_eventData = new PointerEventData(EventSystem.current);
 	}
 
 	void Update()
 	{
 		if (Input.GetMouseButtonDown(0))
+		{
+			_uiHitResults.Clear();
+			_eventData.position = Input.mousePosition;
+			EventSystem.current.RaycastAll(_eventData, _uiHitResults);
+
+			if (_uiHitResults.Count == 0)
+				_startDrag = true;
+
 			_prevMousePos = Input.mousePosition;
+		}
+
+		if (Input.GetMouseButtonUp(0))
+			_startDrag = false;
 
 		if (unlockedLens)
 		{
-			if (Input.GetMouseButton(0))
+			if (Input.GetMouseButton(0) && _startDrag)
 				_inputVec = ((Vector2)Input.mousePosition - _prevMousePos);
 			else
 				_inputVec -= Vector2.ClampMagnitude(_inputVec * _decelSpeed * Time.deltaTime, _inputVec.magnitude);

@@ -185,6 +185,9 @@ public class Block : WadeBehaviour
 			Vector3 mousePos = ((Vector3)WadeUtils.Clamp((Vector2)Input.mousePosition, screenMin, screenMax)).SetZ(Input.mousePosition.z);
 
 			InventoryPanel inventoryPanel = UIManager.GetPanel<InventoryPanel>();
+			inventoryPanel.GetLeftRotateRect().gameObject.SetActive(true);
+			inventoryPanel.GetRightRotateRect().gameObject.SetActive(true);
+
 			_prevUIOverlap = RectTransformUtility.RectangleContainsScreenPoint(inventoryPanel.GetInventoryRect(), mousePos, Camera.main);
 
 			ResetFadeoutTimer();
@@ -333,6 +336,10 @@ public class Block : WadeBehaviour
 				_changeScaleRoutine = StartCoroutine(ChangeScaleRoutine(false));
 				_dropRoutine = StartCoroutine(DropRoutine());
 			}
+
+			InventoryPanel inventoryPanel = UIManager.GetPanel<InventoryPanel>();
+			inventoryPanel.GetLeftRotateRect().gameObject.SetActive(true);
+			inventoryPanel.GetRightRotateRect().gameObject.SetActive(true);
 		}
 	}
 

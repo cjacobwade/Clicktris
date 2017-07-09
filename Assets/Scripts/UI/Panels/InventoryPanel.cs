@@ -48,6 +48,9 @@ public class InventoryPanel : PanelBase
 		_itemButtonPrefabs = Resources.LoadAll<ItemButtonWidget>("Items");
 		_itemSlots = GetComponentsInChildren<ItemSlotWidget>().ToList();
 
+		_leftRotateRect.gameObject.SetActive(false);
+		_rightRotateRect.gameObject.SetActive(false);
+
 		_combineButton.gameObject.SetActive(false);
 	}
 
