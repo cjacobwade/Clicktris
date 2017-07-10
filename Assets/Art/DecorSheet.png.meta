@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: dcb35b9457894d74fbd71ffc52ef1d80
-timeCreated: 1499667007
+timeCreated: 1499667751
 licenseType: Pro
 TextureImporter:
   fileIDToRecycleName:
@@ -240,8 +240,8 @@ TextureImporter:
       name: Pinkle
       rect:
         serializedVersion: 2
-        x: 611
-        y: 348
+        x: 615
+        y: 443
         width: 135
         height: 83
       alignment: 9

@@ -184,11 +184,14 @@ public class Block : WadeBehaviour
 			screenMax -= (screenMax - screenMin) * 0.001f;
 			Vector3 mousePos = ((Vector3)WadeUtils.Clamp((Vector2)Input.mousePosition, screenMin, screenMax)).SetZ(Input.mousePosition.z);
 
-			UIManager.GetPanel<SwapPanel>().OnClickBreed();
-
 			BreedPanel breedPanel = UIManager.GetPanel<BreedPanel>();
 			breedPanel.GetLeftRotateRect().gameObject.SetActive(true);
 			breedPanel.GetRightRotateRect().gameObject.SetActive(true);
+
+			if(!breedPanel.gameObject.activeSelf)
+				UIManager.GetPanel<SwapPanel>().OnClickBreed();
+
+			
 
 			_prevUIOverlap = RectTransformUtility.RectangleContainsScreenPoint(breedPanel.GetBreedRect(), mousePos, Camera.main);
 
