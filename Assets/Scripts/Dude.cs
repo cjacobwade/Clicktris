@@ -21,31 +21,6 @@ public class Dude : WadeBehaviour
 	float _wanderDist = 8f;
 
 	[SerializeField]
-	float _clickWaitTime = 0.7f;
-
-	float _lastClickTime = -10000f;
-
-	[SerializeField]
-	int _clicksToDrop = 5;
-
-	int _numClicks = 0;
-
-	[SerializeField]
-	Block _blockPrefab = null;
-
-	[SerializeField]
-	float _blockDropTime = 1f;
-
-	[SerializeField]
-	float _blockRandomRange = 1f;
-
-	[SerializeField]
-	float _blockArcHeight = 1f;
-
-	[SerializeField]
-	float _blockGroundOffset = 0.15f;
-
-	[SerializeField]
 	float _maxEnlargeSize = 2f;
 
 	[SerializeField]
@@ -69,6 +44,11 @@ public class Dude : WadeBehaviour
 	GroundShadow _shadow = null;
 
 	Vector3 _prevPos = Vector3.zero;
+
+	[SerializeField]
+	float _clickWaitTime = 0.7f;
+
+	float _lastClickTime = -10000f;
 
 	[SerializeField, Range(-1f, 1f)]
 	float _cullDot = 0.1f;
@@ -127,20 +107,6 @@ public class Dude : WadeBehaviour
 	{
 		_heartVFX.Emit(CameraOrbit.GetClickStrength());
 
-		_numClicks += CameraOrbit.GetClickStrength();
-		if (_numClicks > _clicksToDrop + numEnlarges * _clicksToDrop * 0.75f)
-		{
-			_heartVFX.Emit(10);
-
-			for (int i = 0; i <= numEnlarges; i++)
-			{
-				Block block = Instantiate<Block>(_blockPrefab, Planet.instance.transform);
-				StartCoroutine(DropBlockRoutine(block));
-			}
-
-			_numClicks = 0;
-		}
-
 		_lastClickTime = Time.time;
 		_clickTween.Play();
 
@@ -182,37 +148,6 @@ public class Dude : WadeBehaviour
 		animator.enabled = true;
 
 		_enlargeRoutine = null;
-	}
-
-	IEnumerator DropBlockRoutine(Block block)
-	{
-		for(int i = 0; i < block.GetChildColliders().Length; i++)
-			block.GetChildColliders()[i].enabled = false;
-
-		Vector3 startPos = transform.position;
-
-		Vector3 randomOffset = Random.insideUnitSphere;
-		Vector3 normal = Planet.GetNormalAtPosition(transform.position);
-		randomOffset -= normal * Mathf.Abs(Vector3.Dot(randomOffset.normalized, normal));
-
-		Vector3 endPos = transform.position + randomOffset.normalized * _blockRandomRange;
-		endPos = Planet.GetNearestSurfacePos(endPos);
-		endPos += Planet.GetNormalAtPosition(endPos) * _blockGroundOffset;
-
-		float timer = 0f;
-		while(timer < _blockDropTime)
-		{
-			timer += Time.deltaTime;
-
-			float alpha = timer / _blockDropTime;
-			block.transform.position = Vector3.Lerp(startPos, endPos, alpha);
-			block.transform.position += Planet.GetNormalAtPosition(block.transform.position) * Mathf.Sin(alpha * Mathf.PI) * _blockArcHeight;
-
-			yield return null;
-		}
-
-		for (int i = 0; i < block.GetChildColliders().Length; i++)
-			block.GetChildColliders()[i].enabled = true;
 	}
 
 	IEnumerator GoToTargetRoutine()

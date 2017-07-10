@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(LookAtDirection))]
 public class Decor : WadeBehaviour
 {
 	[SerializeField]
@@ -21,16 +22,24 @@ public class Decor : WadeBehaviour
 	[HideInInspector]
 	public Vector3 initOffset = Vector3.zero;
 
+	[SerializeField, Range(-1f, 1f)]
+	float _cullDot = 0f;
+	public float GetCullDot()
+	{ return _cullDot; }
+
 	void Awake()
 	{
 		_spriteRenderer = GetComponentInChildren<SpriteRenderer>();
 		_lookAtDirection = GetComponent<LookAtDirection>();
+
+		initOffset = transform.position - Planet.instance.transform.position;
 
 		Planet.RegisterDecor(this);
 	}
 
 	void OnDestroy()
 	{
-		Planet.DeregisterDecor(this);
+		if(Planet.DoesExist())
+			Planet.DeregisterDecor(this);
 	}
 }

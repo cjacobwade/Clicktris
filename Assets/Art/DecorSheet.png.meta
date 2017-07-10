@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: dcb35b9457894d74fbd71ffc52ef1d80
-timeCreated: 1498893233
+timeCreated: 1499667007
 licenseType: Pro
 TextureImporter:
   fileIDToRecycleName:
@@ -15,6 +15,11 @@ TextureImporter:
     21300016: Tree
     21300018: Rock
     21300020: BigRock
+    21300022: Pinkle
+    21300024: Sunflower
+    21300026: RedBush
+    21300028: Lupine
+    21300030: CatTail
   serializedVersion: 4
   mipmaps:
     mipMapMode: 0
@@ -196,10 +201,10 @@ TextureImporter:
       name: Tree
       rect:
         serializedVersion: 2
-        x: 657
+        x: 661
         y: 53
-        width: 294
-        height: 387
+        width: 290
+        height: 330
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -228,6 +233,71 @@ TextureImporter:
         height: 123
       alignment: 7
       pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Pinkle
+      rect:
+        serializedVersion: 2
+        x: 611
+        y: 348
+        width: 135
+        height: 83
+      alignment: 9
+      pivot: {x: 0.5103891, y: 0.18024859}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Sunflower
+      rect:
+        serializedVersion: 2
+        x: 536
+        y: 180
+        width: 94
+        height: 141
+      alignment: 9
+      pivot: {x: 0.57266104, y: 0.015592967}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: RedBush
+      rect:
+        serializedVersion: 2
+        x: 340
+        y: 298
+        width: 138
+        height: 98
+      alignment: 9
+      pivot: {x: 0.56663644, y: 0.15675509}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Lupine
+      rect:
+        serializedVersion: 2
+        x: 227
+        y: 245
+        width: 91
+        height: 136
+      alignment: 9
+      pivot: {x: 0.5705878, y: 0.066388525}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: CatTail
+      rect:
+        serializedVersion: 2
+        x: 493
+        y: 375
+        width: 71
+        height: 151
+      alignment: 9
+      pivot: {x: 0.52118605, y: 0.024382938}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
